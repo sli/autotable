@@ -2,9 +2,10 @@ module Main exposing (..)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, a, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, a, div, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
 
 
@@ -158,7 +159,7 @@ update msg model =
                         model.data
                         sorting
             in
-            ({ model | sorting = sorting, data = data }, Cmd.none)
+            ( { model | sorting = sorting, data = data }, Cmd.none )
 
 
 view : Model a -> Html Msg
@@ -167,15 +168,22 @@ view model =
         headerCells =
             List.map
                 (\c ->
-                  let
-                      sorting = case findSorting model.sorting c.label of
-                        Just s ->
-                          case second s of
-                            Asc -> "(Asc)"
-                            Desc -> "(Desc)"
-                        Nothing -> ""
-                  in
-                      th [ onClick <| Sort c.label ] [ text <| c.label ++ " " ++ sorting ])
+                    let
+                        sorting =
+                            case findSorting model.sorting c.label of
+                                Just s ->
+                                    case second s of
+                                        Asc ->
+                                            "(Asc)"
+
+                                        Desc ->
+                                            "(Desc)"
+
+                                Nothing ->
+                                    ""
+                    in
+                    th [ onClick <| Sort c.label ] [ text <| c.label ++ " " ++ sorting ]
+                )
                 model.columns
 
         buildRow row =
@@ -188,12 +196,15 @@ view model =
                 (\d -> tr [] (buildRow d))
                 model.data
     in
-    table
-        [ class "w-full" ]
-        [ thead
-            [ class "bg-gray-900 text-white" ]
-            [ tr [] headerCells ]
-        , tbody [] bodyRows
+    div []
+        [ pageCss
+        , table
+            [ class "w-full" ]
+            [ thead
+                [ class "bg-gray-900 text-white" ]
+                [ tr [] headerCells ]
+            , tbody [] bodyRows
+            ]
         ]
 
 
