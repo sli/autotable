@@ -1,0 +1,12 @@
+{
+  "name": "autotable",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "elm-live": "^4.0.1"
+  },
+  "scripts": {
+    "start": "elm-live src/Main.elm --open -- --debug"
+  }
+}
