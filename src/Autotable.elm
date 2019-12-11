@@ -140,7 +140,7 @@ view model toMsg =
 
         bodyRows =
             List.map
-                (\d -> tr [] (buildRow d))
+                (\d -> tr [] <| buildRow d)
                 model.data
     in
     div []
