@@ -1,8 +1,8 @@
 module Autotable exposing (..)
 
 import Browser
-import Html exposing (Html, a, div, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class)
+import Html exposing (Html, a, div, span, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
@@ -20,7 +20,7 @@ type alias Sorting =
 type alias Column a =
     { label : String
     , render : a -> String
-    , sortFn : List a -> Sorting -> List a
+    , sortFn : List a -> List a
     }
 
 
@@ -96,9 +96,9 @@ update msg model =
                                             c.sortFn
 
                                         Nothing ->
-                                            \_ _ -> d
+                                            \_ -> d
                             in
-                            sortFn d s |> setOrder (second s)
+                            sortFn d |> setOrder (second s)
                         )
                         model.data
                         sorting
@@ -118,15 +118,18 @@ view model toMsg =
                                 Just s ->
                                     case second s of
                                         Asc ->
-                                            "(Asc)"
+                                            "▲"
 
                                         Desc ->
-                                            "(Desc)"
+                                            "▼"
 
                                 Nothing ->
-                                    ""
+                                    " "
                     in
-                    th [ onClick <| toMsg <| Sort c.label ] [ text <| c.label ++ " " ++ sorting ]
+                    th [ onClick <| toMsg <| Sort c.label ]
+                        [ text <| c.label
+                        , span [ style "margin-left" "10px", style "font-size" "10pt" ] [ text sorting ]
+                        ]
                 )
                 model.columns
 

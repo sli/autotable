@@ -16,13 +16,13 @@ type alias Person =
     }
 
 
-stringSort : (Person -> String) -> List Person -> AT.Sorting -> List Person
-stringSort fn data sorting =
+stringSort : (Person -> String) -> List Person -> List Person
+stringSort fn data =
     List.sortBy fn data
 
 
-numberSort : (Person -> Int) -> List Person -> AT.Sorting -> List Person
-numberSort fn data sorting =
+numberSort : (Person -> Int) -> List Person -> List Person
+numberSort fn data =
     List.sortBy fn data
 
 
