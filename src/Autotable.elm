@@ -24,13 +24,6 @@ type alias Column a =
     }
 
 
-type alias Attributes a =
-    { columns : List (Column a)
-    , data : List a
-    , sorting : List ( String, Direction )
-    }
-
-
 type alias Model a =
     { columns : List (Column a)
     , data : List a
@@ -44,11 +37,12 @@ type Msg
 
 swapDirection : Sorting -> Sorting
 swapDirection ( label, direction ) =
-    if direction == Asc then
-        ( label, Desc )
+    case direction of
+        Asc ->
+            ( label, Desc )
 
-    else
-        ( label, Asc )
+        Desc ->
+            ( label, Asc )
 
 
 findSorting : List Sorting -> String -> Maybe Sorting
@@ -60,6 +54,15 @@ findColumn : List (Column a) -> String -> Maybe (Column a)
 findColumn columns label =
     List.head <| List.filter (\c -> c.label == label) columns
 
+
+setOrder : Direction -> List a -> List a
+setOrder direction data =
+    case direction of
+      Asc ->
+        data
+
+      Desc ->
+        List.reverse data
 
 init : List (Column a) -> List a -> Model a
 init columns data =
@@ -94,7 +97,7 @@ update msg model =
                                         Nothing ->
                                             \_ _ -> d
                             in
-                            sortFn d s
+                            sortFn d s |> setOrder (second s)
                         )
                         model.data
                         sorting

@@ -10561,23 +10561,11 @@ var $author$project$Autotable$Column = F3(
 var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$Main$numberSort = F3(
 	function (fn, data, sorting) {
-		var sorted = A2($elm$core$List$sortBy, fn, data);
-		var _v0 = sorting.b;
-		if (_v0.$ === 'Asc') {
-			return sorted;
-		} else {
-			return $elm$core$List$reverse(sorted);
-		}
+		return A2($elm$core$List$sortBy, fn, data);
 	});
 var $author$project$Main$stringSort = F3(
 	function (fn, data, sorting) {
-		var sorted = A2($elm$core$List$sortBy, fn, data);
-		var _v0 = sorting.b;
-		if (_v0.$ === 'Asc') {
-			return sorted;
-		} else {
-			return $elm$core$List$reverse(sorted);
-		}
+		return A2($elm$core$List$sortBy, fn, data);
 	});
 var $author$project$Main$myColumns = _List_fromArray(
 	[
@@ -10679,11 +10667,23 @@ var $author$project$Autotable$findSorting = F2(
 				},
 				sorting));
 	});
+var $author$project$Autotable$setOrder = F2(
+	function (direction, data) {
+		if (direction.$ === 'Asc') {
+			return data;
+		} else {
+			return $elm$core$List$reverse(data);
+		}
+	});
 var $author$project$Autotable$Desc = {$: 'Desc'};
 var $author$project$Autotable$swapDirection = function (_v0) {
 	var label = _v0.a;
 	var direction = _v0.b;
-	return _Utils_eq(direction, $author$project$Autotable$Asc) ? _Utils_Tuple2(label, $author$project$Autotable$Desc) : _Utils_Tuple2(label, $author$project$Autotable$Asc);
+	if (direction.$ === 'Asc') {
+		return _Utils_Tuple2(label, $author$project$Autotable$Desc);
+	} else {
+		return _Utils_Tuple2(label, $author$project$Autotable$Asc);
+	}
 };
 var $author$project$Autotable$update = F2(
 	function (msg, model) {
@@ -10722,7 +10722,10 @@ var $author$project$Autotable$update = F2(
 								});
 						}
 					}();
-					return A2(sortFn, d, s);
+					return A2(
+						$author$project$Autotable$setOrder,
+						s.b,
+						A2(sortFn, d, s));
 				}),
 			model.data,
 			sorting);

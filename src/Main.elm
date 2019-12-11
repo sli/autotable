@@ -18,31 +18,13 @@ type alias Person =
 
 stringSort : (Person -> String) -> List Person -> AT.Sorting -> List Person
 stringSort fn data sorting =
-    let
-        sorted =
-            List.sortBy fn data
-    in
-    case second sorting of
-        AT.Asc ->
-            sorted
+    List.sortBy fn data
 
-        AT.Desc ->
-            List.reverse sorted
 
 
 numberSort : (Person -> Int) -> List Person -> AT.Sorting -> List Person
 numberSort fn data sorting =
-    let
-        sorted =
-            List.sortBy fn data
-    in
-    case second sorting of
-        AT.Asc ->
-            sorted
-
-        AT.Desc ->
-            List.reverse sorted
-
+    List.sortBy fn data
 
 myColumns : List (AT.Column Person)
 myColumns =
