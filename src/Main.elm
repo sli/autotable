@@ -21,10 +21,10 @@ stringSort fn data sorting =
     List.sortBy fn data
 
 
-
 numberSort : (Person -> Int) -> List Person -> AT.Sorting -> List Person
 numberSort fn data sorting =
     List.sortBy fn data
+
 
 myColumns : List (AT.Column Person)
 myColumns =

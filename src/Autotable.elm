@@ -58,11 +58,12 @@ findColumn columns label =
 setOrder : Direction -> List a -> List a
 setOrder direction data =
     case direction of
-      Asc ->
-        data
+        Asc ->
+            data
 
-      Desc ->
-        List.reverse data
+        Desc ->
+            List.reverse data
+
 
 init : List (Column a) -> List a -> Model a
 init columns data =
