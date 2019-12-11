@@ -10550,7 +10550,11 @@ var $elm$core$Basics$never = function (_v0) {
 	}
 };
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$Column = F3(
+var $author$project$Autotable$init = F2(
+	function (columns, data) {
+		return {columns: columns, data: data, sorting: _List_Nil};
+	});
+var $author$project$Autotable$Column = F3(
 	function (label, render, sortFn) {
 		return {label: label, render: render, sortFn: sortFn};
 	});
@@ -10578,7 +10582,7 @@ var $author$project$Main$stringSort = F3(
 var $author$project$Main$myColumns = _List_fromArray(
 	[
 		A3(
-		$author$project$Main$Column,
+		$author$project$Autotable$Column,
 		'Name',
 		function (p) {
 			return p.name;
@@ -10588,7 +10592,7 @@ var $author$project$Main$myColumns = _List_fromArray(
 				return $.name;
 			})),
 		A3(
-		$author$project$Main$Column,
+		$author$project$Autotable$Column,
 		'Age',
 		function (p) {
 			return $elm$core$String$fromInt(p.age);
@@ -10598,7 +10602,7 @@ var $author$project$Main$myColumns = _List_fromArray(
 				return $.age;
 			})),
 		A3(
-		$author$project$Main$Column,
+		$author$project$Autotable$Column,
 		'Cats',
 		function (p) {
 			return $elm$core$String$fromInt(p.cats);
@@ -10614,17 +10618,19 @@ var $author$project$Main$Person = F3(
 	});
 var $author$project$Main$myData = _List_fromArray(
 	[
-		A3($author$project$Main$Person, 'A', 30, 2),
-		A3($author$project$Main$Person, 'B', 30, 1),
-		A3($author$project$Main$Person, 'C', 31, 2),
-		A3($author$project$Main$Person, 'D', 31, 3),
-		A3($author$project$Main$Person, 'E', 32, 3),
-		A3($author$project$Main$Person, 'F', 32, 1),
-		A3($author$project$Main$Person, 'G', 33, 1)
+		A3($author$project$Main$Person, 'Bob', 30, 2),
+		A3($author$project$Main$Person, 'Dick', 30, 1),
+		A3($author$project$Main$Person, 'Jane', 31, 2),
+		A3($author$project$Main$Person, 'William', 31, 3),
+		A3($author$project$Main$Person, 'Jolene', 32, 3),
+		A3($author$project$Main$Person, 'Holly', 32, 1),
+		A3($author$project$Main$Person, 'Xavier', 33, 1)
 	]);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{columns: $author$project$Main$myColumns, data: $author$project$Main$myData, sorting: _List_Nil},
+		{
+			tableState: A2($author$project$Autotable$init, $author$project$Main$myColumns, $author$project$Main$myData)
+		},
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -10632,7 +10638,7 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$none;
 };
-var $author$project$Main$Asc = {$: 'Asc'};
+var $author$project$Autotable$Asc = {$: 'Asc'};
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -10653,7 +10659,7 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Main$findColumn = F2(
+var $author$project$Autotable$findColumn = F2(
 	function (columns, label) {
 		return $elm$core$List$head(
 			A2(
@@ -10663,7 +10669,7 @@ var $author$project$Main$findColumn = F2(
 				},
 				columns));
 	});
-var $author$project$Main$findSorting = F2(
+var $author$project$Autotable$findSorting = F2(
 	function (sorting, label) {
 		return $elm$core$List$head(
 			A2(
@@ -10673,22 +10679,22 @@ var $author$project$Main$findSorting = F2(
 				},
 				sorting));
 	});
-var $author$project$Main$Desc = {$: 'Desc'};
-var $author$project$Main$swapDirection = function (_v0) {
+var $author$project$Autotable$Desc = {$: 'Desc'};
+var $author$project$Autotable$swapDirection = function (_v0) {
 	var label = _v0.a;
 	var direction = _v0.b;
-	return _Utils_eq(direction, $author$project$Main$Asc) ? _Utils_Tuple2(label, $author$project$Main$Desc) : _Utils_Tuple2(label, $author$project$Main$Asc);
+	return _Utils_eq(direction, $author$project$Autotable$Asc) ? _Utils_Tuple2(label, $author$project$Autotable$Desc) : _Utils_Tuple2(label, $author$project$Autotable$Asc);
 };
-var $author$project$Main$update = F2(
+var $author$project$Autotable$update = F2(
 	function (msg, model) {
 		var key = msg.a;
 		var dir = function () {
-			var _v4 = A2($author$project$Main$findSorting, model.sorting, key);
+			var _v4 = A2($author$project$Autotable$findSorting, model.sorting, key);
 			if (_v4.$ === 'Just') {
 				var v = _v4.a;
-				return $author$project$Main$swapDirection(v);
+				return $author$project$Autotable$swapDirection(v);
 			} else {
-				return _Utils_Tuple2(key, $author$project$Main$Asc);
+				return _Utils_Tuple2(key, $author$project$Autotable$Asc);
 			}
 		}();
 		var sorting = _Utils_ap(
@@ -10705,7 +10711,7 @@ var $author$project$Main$update = F2(
 			F2(
 				function (s, d) {
 					var sortFn = function () {
-						var _v1 = A2($author$project$Main$findColumn, model.columns, s.a);
+						var _v1 = A2($author$project$Autotable$findColumn, model.columns, s.a);
 						if (_v1.$ === 'Just') {
 							var c = _v1.a;
 							return c.sortFn;
@@ -10720,14 +10726,27 @@ var $author$project$Main$update = F2(
 				}),
 			model.data,
 			sorting);
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{data: data, sorting: sorting}),
-			$elm$core$Platform$Cmd$none);
+		return _Utils_update(
+			model,
+			{data: data, sorting: sorting});
 	});
-var $author$project$Main$Sort = function (a) {
-	return {$: 'Sort', a: a};
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		if (msg.$ === 'NoOp') {
+			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		} else {
+			var tableMsg = msg.a;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						tableState: A2($author$project$Autotable$update, tableMsg, model.tableState)
+					}),
+				$elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Main$TableMsg = function (a) {
+	return {$: 'TableMsg', a: a};
 };
 var $rtfeldman$elm_css$Css$Structure$Compatible = {$: 'Compatible'};
 var $rtfeldman$elm_css$Css$auto = {alignItemsOrAuto: $rtfeldman$elm_css$Css$Structure$Compatible, cursor: $rtfeldman$elm_css$Css$Structure$Compatible, flexBasis: $rtfeldman$elm_css$Css$Structure$Compatible, intOrAuto: $rtfeldman$elm_css$Css$Structure$Compatible, justifyContentOrAuto: $rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAuto: $rtfeldman$elm_css$Css$Structure$Compatible, lengthOrAutoOrCoverOrContain: $rtfeldman$elm_css$Css$Structure$Compatible, lengthOrNumberOrAutoOrNoneOrContent: $rtfeldman$elm_css$Css$Structure$Compatible, overflow: $rtfeldman$elm_css$Css$Structure$Compatible, pointerEvents: $rtfeldman$elm_css$Css$Structure$Compatible, tableLayout: $rtfeldman$elm_css$Css$Structure$Compatible, textRendering: $rtfeldman$elm_css$Css$Structure$Compatible, touchAction: $rtfeldman$elm_css$Css$Structure$Compatible, value: 'auto'};
@@ -13085,70 +13104,104 @@ var $author$project$PageCss$pageCss = $rtfeldman$elm_css$Html$Styled$toUnstyled(
 					])),
 				$rtfeldman$elm_css$Css$Global$td(_List_Nil)
 			])));
+var $author$project$Autotable$Sort = function (a) {
+	return {$: 'Sort', a: a};
+};
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $elm$html$Html$tbody = _VirtualDom_node('tbody');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $elm$html$Html$thead = _VirtualDom_node('thead');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Main$view = function (model) {
-	var headerCells = A2(
-		$elm$core$List$map,
-		function (c) {
-			var sorting = function () {
-				var _v0 = A2($author$project$Main$findSorting, model.sorting, c.label);
-				if (_v0.$ === 'Just') {
-					var s = _v0.a;
-					var _v1 = s.b;
-					if (_v1.$ === 'Asc') {
-						return '(Asc)';
-					} else {
-						return '(Desc)';
-					}
-				} else {
-					return '';
-				}
-			}();
-			return A2(
-				$elm$html$Html$th,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick(
-						$author$project$Main$Sort(c.label))
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(c.label + (' ' + sorting))
-					]));
-		},
-		model.columns);
-	var buildRow = function (row) {
-		return A2(
+var $author$project$Autotable$view = F2(
+	function (model, toMsg) {
+		var headerCells = A2(
 			$elm$core$List$map,
 			function (c) {
+				var sorting = function () {
+					var _v0 = A2($author$project$Autotable$findSorting, model.sorting, c.label);
+					if (_v0.$ === 'Just') {
+						var s = _v0.a;
+						var _v1 = s.b;
+						if (_v1.$ === 'Asc') {
+							return '(Asc)';
+						} else {
+							return '(Desc)';
+						}
+					} else {
+						return '';
+					}
+				}();
 				return A2(
-					$elm$html$Html$td,
+					$elm$html$Html$th,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('text-left')
+							$elm$html$Html$Events$onClick(
+							toMsg(
+								$author$project$Autotable$Sort(c.label)))
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text(
-							c.render(row))
+							$elm$html$Html$text(c.label + (' ' + sorting))
 						]));
 			},
 			model.columns);
-	};
-	var bodyRows = A2(
-		$elm$core$List$map,
-		function (d) {
+		var buildRow = function (row) {
 			return A2(
-				$elm$html$Html$tr,
-				_List_Nil,
-				buildRow(d));
-		},
-		model.data);
+				$elm$core$List$map,
+				function (c) {
+					return A2(
+						$elm$html$Html$td,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('text-left')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								c.render(row))
+							]));
+				},
+				model.columns);
+		};
+		var bodyRows = A2(
+			$elm$core$List$map,
+			function (d) {
+				return A2(
+					$elm$html$Html$tr,
+					_List_Nil,
+					buildRow(d));
+			},
+			model.data);
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$author$project$PageCss$pageCss,
+					A2(
+					$elm$html$Html$table,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('w-full')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$thead,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('bg-gray-900 text-white')
+								]),
+							_List_fromArray(
+								[
+									A2($elm$html$Html$tr, _List_Nil, headerCells)
+								])),
+							A2($elm$html$Html$tbody, _List_Nil, bodyRows)
+						]))
+				]));
+	});
+var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -13156,31 +13209,18 @@ var $author$project$Main$view = function (model) {
 			[
 				$author$project$PageCss$pageCss,
 				A2(
-				$elm$html$Html$table,
+				$elm$html$Html$div,
+				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('w-full')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$thead,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('bg-gray-900 text-white')
-							]),
-						_List_fromArray(
-							[
-								A2($elm$html$Html$tr, _List_Nil, headerCells)
-							])),
-						A2($elm$html$Html$tbody, _List_Nil, bodyRows)
+						A2($author$project$Autotable$view, model.tableState, $author$project$Main$TableMsg)
 					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{},"unions":{"Main.Msg":{"args":[],"tags":{"Sort":["String.String"]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{},"unions":{"Main.Msg":{"args":[],"tags":{"NoOp":[],"TableMsg":["Autotable.Msg"]}},"Autotable.Msg":{"args":[],"tags":{"Sort":["String.String"]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
 
   var app = Elm.Main.init({ node: document.getElementById("elm") });
 }
