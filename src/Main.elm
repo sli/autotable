@@ -37,12 +37,16 @@ myColumns =
 myData : List Person
 myData =
     [ Person "Bob" 30 2
-    , Person "Dick" 30 1
+    , Person "Jack" 30 1
     , Person "Jane" 31 2
     , Person "William" 31 3
     , Person "Jolene" 32 3
+    , Person "Billy" 43 5
     , Person "Holly" 32 1
     , Person "Xavier" 33 1
+    , Person "Jimmy" 35 0
+    , Person "John" 34 0
+    , Person "Ashley" 34 1
     ]
 
 

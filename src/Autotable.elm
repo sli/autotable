@@ -23,6 +23,9 @@ type alias Column a =
     , sortFn : List a -> List a
     }
 
+type Row a
+  = Row a
+  | Editing a
 
 type alias Model a =
     { columns : List (Column a)
