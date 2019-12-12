@@ -11,6 +11,7 @@ import Tuple exposing (first, second)
 type Direction
     = Asc
     | Desc
+    | None
 
 
 type alias Sorting =
@@ -70,6 +71,9 @@ swapDirection ( label, direction ) =
             ( label, Desc )
 
         Desc ->
+            ( label, None )
+
+        None ->
             ( label, Asc )
 
 
@@ -96,11 +100,11 @@ indexForColumn label columns =
 setOrder : Direction -> List a -> List a
 setOrder direction data =
     case direction of
-        Asc ->
-            data
-
         Desc ->
             List.reverse data
+
+        _ ->
+          data
 
 
 init : List (Column a) -> List a -> Model a
@@ -200,8 +204,11 @@ view model toMsg =
                                         Desc ->
                                             "▼"
 
+                                        None ->
+                                            ""
+
                                 Nothing ->
-                                    " "
+                                    ""
                     in
                     th
                         [ onClick <| toMsg <| Sort c.label
