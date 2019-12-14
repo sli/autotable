@@ -156,11 +156,13 @@ update msg model =
 
         Filter key s ->
             let
-                -- filters =
-                --     List.filter (\f -> first f /= key) model.filters ++ [ ( key, s ) ]
-
                 filters =
-                    model.filters
+                    case s of
+                        "" ->
+                            List.filter (\f -> first f /= key) model.filters
+
+                        _ ->
+                            List.filter (\f -> first f /= key) model.filters ++ [ ( key, s ) ]
             in
             { model | filters = filters }
 
@@ -207,6 +209,23 @@ update msg model =
 view : Model a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
+        filtered =
+            List.foldl
+                (\f d ->
+                    let
+                        filterFn =
+                            case findColumn model.columns (first f) of
+                                Just c ->
+                                    c.filterFn
+
+                                Nothing ->
+                                    \_ _ -> d
+                    in
+                    filterFn d <| second f
+                )
+                model.data
+                model.filters
+
         sorted =
             List.foldl
                 (\s d ->
@@ -221,7 +240,7 @@ view model toMsg =
                     in
                     sortFn d |> setOrder (second s)
                 )
-                model.data
+                filtered
                 model.sorting
     in
     div []
@@ -270,8 +289,12 @@ viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewFilterCells model toMsg =
     List.map
         (\c ->
+            let
+                inputHandler s =
+                    toMsg <| Filter c.label s
+            in
             th []
-                [ input [ type_ "text", placeholder "Filter" ] []
+                [ input [ type_ "text", placeholder "Filter", onInput inputHandler ] []
                 ]
         )
         model.columns

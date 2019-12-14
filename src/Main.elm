@@ -28,12 +28,18 @@ numberSort fn data =
 
 stringFilter : (Person -> String) -> List Person -> String -> List Person
 stringFilter fn data s =
-    List.filter (\d -> String.startsWith s <| fn d) data
+    let
+        ls =
+            String.toLower s
+    in
+    List.filter (\d -> String.startsWith ls <| String.toLower <| fn d) data
 
 
 numberFilter : (Person -> Int) -> List Person -> String -> List Person
 numberFilter fn data s =
-    List.filter (\d -> String.startsWith (String.fromInt <| fn d) s) data
+    List.filter
+        (\d -> String.startsWith s <| String.fromInt <| fn d)
+        data
 
 
 myColumns : List (AT.Column Person)
