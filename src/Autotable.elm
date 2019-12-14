@@ -24,9 +24,11 @@ type alias Column a =
     , sortFn : List a -> List a
     }
 
+
 type Row a
-  = Row a
-  | Editing a
+    = Row a
+    | Editing a
+
 
 type alias Model a =
     { columns : List (Column a)
@@ -104,7 +106,7 @@ setOrder direction data =
             List.reverse data
 
         _ ->
-          data
+            data
 
 
 init : List (Column a) -> List a -> Model a
@@ -124,13 +126,14 @@ update msg model =
 
                         Nothing ->
                             Asc
-                sorting =
-                  case dir of
-                    None ->
-                      List.filter (\s -> first s /= key) model.sorting
 
-                    _ ->
-                      List.filter (\s -> first s /= key) model.sorting ++ [ ( key, dir) ]
+                sorting =
+                    case dir of
+                        None ->
+                            List.filter (\s -> first s /= key) model.sorting
+
+                        _ ->
+                            List.filter (\s -> first s /= key) model.sorting ++ [ ( key, dir ) ]
             in
             { model | sorting = sorting }
 
