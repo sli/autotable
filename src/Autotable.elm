@@ -233,7 +233,7 @@ view model toMsg =
 
         buildRow row =
             List.map
-                (\c -> td [ class "text-left" ] [ text (c.render row) ])
+                (\c -> td [ class "text-left" ] [ text <| c.render row ])
                 model.columns
 
         bodyRows =
