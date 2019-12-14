@@ -156,8 +156,11 @@ update msg model =
 
         Filter key s ->
             let
+                -- filters =
+                --     List.filter (\f -> first f /= key) model.filters ++ [ ( key, s ) ]
+
                 filters =
-                    List.filter (\f -> first f /= key) model.filters ++ [ ( key, s ) ]
+                    model.filters
             in
             { model | filters = filters }
 
@@ -265,7 +268,13 @@ viewHeaderCells model toMsg =
 
 viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewFilterCells model toMsg =
-    List.map (\c -> th [] [ input [ type_ "text", placeholder "Filter" ] [] ]) model.columns
+    List.map
+        (\c ->
+            th []
+                [ input [ type_ "text", placeholder "Filter" ] []
+                ]
+        )
+        model.columns
 
 
 viewBodyRows : Model a -> List a -> List (Html msg)
