@@ -64,17 +64,17 @@ onDrop msg =
     on "drop" <| D.succeed msg
 
 
-swapDirection : Sorting -> Sorting
-swapDirection ( label, direction ) =
+stepDirection : Direction -> Direction
+stepDirection direction =
     case direction of
         Asc ->
-            ( label, Desc )
+            Desc
 
         Desc ->
-            ( label, None )
+            None
 
         None ->
-            ( label, Asc )
+            Asc
 
 
 findSorting : List Sorting -> String -> Maybe Sorting
@@ -120,32 +120,19 @@ update msg model =
                 dir =
                     case findSorting model.sorting key of
                         Just v ->
-                            swapDirection v
+                            stepDirection (second v)
 
                         Nothing ->
-                            ( key, Asc )
-
+                            Asc
                 sorting =
-                    List.filter (\s -> first s /= key) model.sorting ++ [ dir ]
+                  case dir of
+                    None ->
+                      List.filter (\s -> first s /= key) model.sorting
 
-                data =
-                    List.foldl
-                        (\s d ->
-                            let
-                                sortFn =
-                                    case findColumn model.columns (first s) of
-                                        Just c ->
-                                            c.sortFn
-
-                                        Nothing ->
-                                            \_ -> d
-                            in
-                            sortFn d |> setOrder (second s)
-                        )
-                        model.data
-                        sorting
+                    _ ->
+                      List.filter (\s -> first s /= key) model.sorting ++ [ ( key, dir) ]
             in
-            { model | sorting = sorting, data = data }
+            { model | sorting = sorting }
 
         DragStart target ->
             { model | dragging = Just target }
@@ -190,6 +177,23 @@ update msg model =
 view : Model a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
+        data =
+            List.foldl
+                (\s d ->
+                    let
+                        sortFn =
+                            case findColumn model.columns (first s) of
+                                Just c ->
+                                    c.sortFn
+
+                                Nothing ->
+                                    \_ -> d
+                    in
+                    sortFn d |> setOrder (second s)
+                )
+                model.data
+                model.sorting
+
         headerCells =
             List.map
                 (\c ->
@@ -232,7 +236,7 @@ view model toMsg =
         bodyRows =
             List.map
                 (\d -> tr [] <| buildRow d)
-                model.data
+                data
     in
     div []
         [ pageCss
