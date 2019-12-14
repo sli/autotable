@@ -1,8 +1,8 @@
 module Autotable exposing (..)
 
-import Html exposing (Html, a, div, span, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, style)
-import Html.Events exposing (on, onClick)
+import Html exposing (Html, a, div, input, span, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (class, placeholder, style, type_)
+import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as D
 import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
@@ -18,10 +18,15 @@ type alias Sorting =
     ( String, Direction )
 
 
+type alias Filter =
+    ( String, String )
+
+
 type alias Column a =
     { label : String
     , render : a -> String
     , sortFn : List a -> List a
+    , filterFn : List a -> String -> List a
     }
 
 
@@ -34,12 +39,14 @@ type alias Model a =
     { columns : List (Column a)
     , data : List a
     , sorting : List Sorting
+    , filters : List Filter
     , dragging : Maybe String
     }
 
 
 type Msg
     = Sort String
+    | Filter String String
     | DragStart String
     | DragEnd
     | DragOver String
@@ -84,6 +91,16 @@ findSorting sorting label =
     List.head <| List.filter (\s -> first s == label) sorting
 
 
+findFilter : List (Column a) -> List Filter -> String -> Maybe Filter
+findFilter columns filters label =
+    case findColumn columns label of
+        Just c ->
+            List.head <| List.filter (\f -> first f == c.label) filters
+
+        Nothing ->
+            Nothing
+
+
 findColumn : List (Column a) -> String -> Maybe (Column a)
 findColumn columns label =
     List.head <| List.filter (\c -> c.label == label) columns
@@ -111,7 +128,7 @@ setOrder direction data =
 
 init : List (Column a) -> List a -> Model a
 init columns data =
-    { dragging = Nothing, columns = columns, data = data, sorting = [] }
+    { dragging = Nothing, columns = columns, data = data, sorting = [], filters = [] }
 
 
 update : Msg -> Model a -> Model a
@@ -136,6 +153,13 @@ update msg model =
                             List.filter (\s -> first s /= key) model.sorting ++ [ ( key, dir ) ]
             in
             { model | sorting = sorting }
+
+        Filter key s ->
+            let
+                filters =
+                    List.filter (\f -> first f /= key) model.filters ++ [ ( key, s ) ]
+            in
+            { model | filters = filters }
 
         DragStart target ->
             { model | dragging = Just target }
@@ -180,7 +204,7 @@ update msg model =
 view : Model a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
-        data =
+        sorted =
             List.foldl
                 (\s d ->
                     let
@@ -196,50 +220,6 @@ view model toMsg =
                 )
                 model.data
                 model.sorting
-
-        headerCells =
-            List.map
-                (\c ->
-                    let
-                        sorting =
-                            case findSorting model.sorting c.label of
-                                Just s ->
-                                    case second s of
-                                        Asc ->
-                                            "▲"
-
-                                        Desc ->
-                                            "▼"
-
-                                        None ->
-                                            ""
-
-                                Nothing ->
-                                    ""
-                    in
-                    th
-                        [ onClick <| toMsg <| Sort c.label
-                        , onDragStart <| toMsg <| DragStart c.label
-                        , onDragEnd <| toMsg DragEnd
-                        , onDragOver <| toMsg <| DragOver c.label
-                        , Html.Attributes.draggable "true"
-                        , style "user-select" "none"
-                        ]
-                        [ text <| c.label
-                        , span [ style "margin-left" "10px", style "font-size" "10pt" ] [ text sorting ]
-                        ]
-                )
-                model.columns
-
-        buildRow row =
-            List.map
-                (\c -> td [ class "text-left" ] [ text <| c.render row ])
-                model.columns
-
-        bodyRows =
-            List.map
-                (\d -> tr [] <| buildRow d)
-                data
     in
     div []
         [ pageCss
@@ -247,7 +227,68 @@ view model toMsg =
             [ class "w-full" ]
             [ thead
                 [ class "bg-gray-900 text-white" ]
-                [ tr [] headerCells ]
-            , tbody [] bodyRows
+                [ tr [] <| viewHeaderCells model toMsg
+                , tr [] <| viewFilterCells model toMsg
+                ]
+            , tbody [] <| viewBodyRows model sorted
             ]
         ]
+
+
+viewHeaderCells : Model a -> (Msg -> msg) -> List (Html msg)
+viewHeaderCells model toMsg =
+    List.map
+        (\c ->
+            let
+                sorting =
+                    case findSorting model.sorting c.label of
+                        Just s ->
+                            viewDirection <| second s
+
+                        Nothing ->
+                            ""
+            in
+            th
+                [ onClick <| toMsg <| Sort c.label
+                , onDragStart <| toMsg <| DragStart c.label
+                , onDragEnd <| toMsg DragEnd
+                , onDragOver <| toMsg <| DragOver c.label
+                , Html.Attributes.draggable "true"
+                , style "user-select" "none"
+                ]
+                [ text <| c.label
+                , span [ class "sort-indicator" ] [ text sorting ]
+                ]
+        )
+        model.columns
+
+
+viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
+viewFilterCells model toMsg =
+    List.map (\c -> th [] [ input [ type_ "text", placeholder "Filter" ] [] ]) model.columns
+
+
+viewBodyRows : Model a -> List a -> List (Html msg)
+viewBodyRows model data =
+    let
+        buildRow row =
+            List.map
+                (\c -> td [ class "text-left" ] [ text <| c.render row ])
+                model.columns
+    in
+    List.map
+        (\d -> tr [] <| buildRow d)
+        data
+
+
+viewDirection : Direction -> String
+viewDirection direction =
+    case direction of
+        Asc ->
+            "▲"
+
+        Desc ->
+            "▼"
+
+        None ->
+            ""

@@ -26,11 +26,21 @@ numberSort fn data =
     List.sortBy fn data
 
 
+stringFilter : (Person -> String) -> List Person -> String -> List Person
+stringFilter fn data s =
+    List.filter (\d -> String.startsWith s <| fn d) data
+
+
+numberFilter : (Person -> Int) -> List Person -> String -> List Person
+numberFilter fn data s =
+    List.filter (\d -> String.startsWith (String.fromInt <| fn d) s) data
+
+
 myColumns : List (AT.Column Person)
 myColumns =
-    [ AT.Column "Name" (\p -> p.name) <| stringSort .name
-    , AT.Column "Age" (\p -> String.fromInt p.age) <| numberSort .age
-    , AT.Column "Cats" (\p -> String.fromInt p.cats) <| numberSort .cats
+    [ AT.Column "Name" (\p -> p.name) (stringSort .name) (stringFilter .name)
+    , AT.Column "Age" (\p -> String.fromInt p.age) (numberSort .age) (numberFilter .age)
+    , AT.Column "Cats" (\p -> String.fromInt p.cats) (numberSort .cats) (numberFilter .cats)
     ]
 
 
