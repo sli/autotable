@@ -10,16 +10,25 @@ pageCss =
         global
             [ body [ fontFamily sansSerif ]
             , CG.table
-                [ borderRadius (px 5)
-                , border3 (px 1) solid <| rgba 190 190 190 0.25
+                [ borderSpacing (px 0)
+                , borderCollapse collapse
                 , boxShadow5 (px 0) (px 0) (px 20) (px 2) <| rgba 190 190 190 0.25
-                , margin (px 0)
+                , margin2 (rem 10.0) auto
                 , padding (px 0)
                 ]
-            , tr [ nthChild "even" [ backgroundColor <| rgba 0 0 0 0.035 ] ]
             , thead
                 [ descendants
-                    [ tr [ color <| rgb 50 50 50 ] ]
+                    [ tr [ color <| rgb 50 50 50, backgroundColor <| rgba 0 0 0 0.035 ]
+                    , tr [ lastChild [ borderBottom3 (px 1) solid <| rgba 190 190 190 0.25 ] ]
+                    ]
+                ]
+            , tbody
+                [ descendants
+                    [ tr
+                        [ nthChild "even" [ backgroundColor <| rgba 0 0 0 0.035 ]
+                        , borderBottom3 (px 1) solid <| rgba 190 190 190 0.25
+                        ]
+                    ]
                 ]
             , th [ width (pct 15), padding (rem 0.5), textAlign left ]
             , td [ padding (rem 0.5) ]
@@ -32,10 +41,5 @@ pageCss =
                 , border (px 1)
                 , borderColor <| rgb 0 0 0
                 , padding (rem 0.25)
-
-                -- , width (pct 100)
                 ]
-
-            -- , selector "th > input"
-            --     [ width (pct 100) ]
             ]
