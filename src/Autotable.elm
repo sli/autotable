@@ -31,7 +31,7 @@ type alias Column a =
 
 
 type Row a
-    = Row a
+    = Viewing a
     | Editing a
 
 
