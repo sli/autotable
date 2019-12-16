@@ -30,9 +30,13 @@ type alias Column a =
     }
 
 
-type Row a
-    = Viewing a
-    | Editing a
+
+-- Store a List of these to control a row's mode?
+
+
+type RowMode
+    = Viewing
+    | Editing
 
 
 type alias Model a =
