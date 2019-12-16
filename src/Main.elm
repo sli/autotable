@@ -44,9 +44,9 @@ numberFilter fn data s =
 
 myColumns : List (AT.Column Person)
 myColumns =
-    [ AT.Column "Name" (\p -> p.name) (stringSort .name) (stringFilter .name)
-    , AT.Column "Age" (\p -> String.fromInt p.age) (numberSort .age) (numberFilter .age)
-    , AT.Column "Cats" (\p -> String.fromInt p.cats) (numberSort .cats) (numberFilter .cats)
+    [ AT.Column "Name" "name" (\p -> p.name) (stringSort .name) (stringFilter .name)
+    , AT.Column "Age" "age" (\p -> String.fromInt p.age) (numberSort .age) (numberFilter .age)
+    , AT.Column "Cats" "cats" (\p -> String.fromInt p.cats) (numberSort .cats) (numberFilter .cats)
     ]
 
 

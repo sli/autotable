@@ -24,6 +24,7 @@ type alias Filter =
 
 type alias Column a =
     { label : String
+    , key : String
     , render : a -> String
     , sortFn : List a -> List a
     , filterFn : List a -> String -> List a
@@ -96,29 +97,29 @@ stepDirection direction =
             Asc
 
 
+findColumn : List (Column a) -> String -> Maybe (Column a)
+findColumn columns key =
+    List.head <| List.filter (\c -> c.key == key) columns
+
+
 findSorting : List Sorting -> String -> Maybe Sorting
-findSorting sorting label =
-    List.head <| List.filter (\s -> first s == label) sorting
+findSorting sorting key =
+    List.head <| List.filter (\s -> first s == key) sorting
 
 
 findFilter : List (Column a) -> List Filter -> String -> Maybe Filter
-findFilter columns filters label =
-    case findColumn columns label of
+findFilter columns filters key =
+    case findColumn columns key of
         Just c ->
-            List.head <| List.filter (\f -> first f == c.label) filters
+            List.head <| List.filter (\f -> first f == c.key) filters
 
         Nothing ->
             Nothing
 
 
-findColumn : List (Column a) -> String -> Maybe (Column a)
-findColumn columns label =
-    List.head <| List.filter (\c -> c.label == label) columns
-
-
 indexForColumn : String -> List (Column a) -> Maybe Int
-indexForColumn label columns =
-    case List.head <| List.filter (\( i, c ) -> c.label == label) <| List.indexedMap (\i c -> ( i, c )) columns of
+indexForColumn key columns =
+    case List.head <| List.filter (\( i, c ) -> c.key == key) <| List.indexedMap (\i c -> ( i, c )) columns of
         Just ( i, _ ) ->
             Just i
 
@@ -187,13 +188,13 @@ update msg model =
             case indexForColumn target model.columns of
                 Just targetPosition ->
                     case model.dragging of
-                        Just label ->
-                            if label /= target then
-                                case List.head <| List.filter (\c -> c.label == label) model.columns of
+                        Just key ->
+                            if key /= target then
+                                case List.head <| List.filter (\c -> c.key == key) model.columns of
                                     Just column ->
                                         let
                                             cleaned =
-                                                List.filter (\c -> c.label /= label) model.columns
+                                                List.filter (\c -> c.key /= key) model.columns
 
                                             columns =
                                                 List.take targetPosition cleaned ++ [ column ] ++ List.drop targetPosition cleaned
@@ -273,7 +274,7 @@ viewHeaderCells model toMsg =
         (\c ->
             let
                 sorting =
-                    case findSorting model.sorting c.label of
+                    case findSorting model.sorting c.key of
                         Just s ->
                             viewDirection <| second s
 
@@ -281,10 +282,10 @@ viewHeaderCells model toMsg =
                             ""
             in
             th
-                [ onClick <| toMsg <| Sort c.label
-                , onDragStart <| toMsg <| DragStart c.label
+                [ onClick <| toMsg <| Sort c.key
+                , onDragStart <| toMsg <| DragStart c.key
                 , onDragEnd <| toMsg DragEnd
-                , onDragOver <| toMsg <| DragOver c.label
+                , onDragOver <| toMsg <| DragOver c.key
                 , Html.Attributes.draggable "true"
                 , style "user-select" "none"
                 ]
@@ -301,7 +302,7 @@ viewFilterCells model toMsg =
         (\c ->
             let
                 inputHandler s =
-                    toMsg <| Filter c.label s
+                    toMsg <| Filter c.key s
             in
             th []
                 [ input [ type_ "text", placeholder "Filter", onInput inputHandler ] []
