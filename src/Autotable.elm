@@ -42,6 +42,7 @@ type RowMode
 type alias Model a =
     { columns : List (Column a)
     , data : List a
+    , rowModes : List RowMode
     , sorting : List Sorting
     , filters : List Filter
     , dragging : Maybe String
@@ -55,6 +56,11 @@ type Msg
     | DragEnd
     | DragOver String
     | Drop
+
+
+zip : List a -> List b -> List ( a, b )
+zip xs ys =
+    List.map2 Tuple.pair xs ys
 
 
 onDragStart : msg -> Html.Attribute msg
@@ -132,7 +138,7 @@ setOrder direction data =
 
 init : List (Column a) -> List a -> Model a
 init columns data =
-    { dragging = Nothing, columns = columns, data = data, sorting = [], filters = [] }
+    { dragging = Nothing, columns = columns, data = data, rowModes = List.repeat (List.length data) Viewing, sorting = [], filters = [] }
 
 
 update : Msg -> Model a -> Model a
