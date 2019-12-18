@@ -1,5 +1,6 @@
 module Autotable exposing (..)
 
+import Array exposing (Array)
 import Html exposing (Html, a, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, placeholder, style, type_)
 import Html.Events exposing (on, onClick, onInput)
@@ -26,8 +27,8 @@ type alias Column a =
     { label : String
     , key : String
     , render : a -> String
-    , sortFn : List a -> List a
-    , filterFn : List a -> String -> List a
+    , sortFn : a -> String
+    , filterFn : a -> String -> Bool
     }
 
 
@@ -37,22 +38,22 @@ type RowMode
 
 
 type alias Model a =
-    { columns : List (Column a)
-    , data : List a
-    , sorting : List Sorting
-    , filters : List Filter
+    { columns : Array (Column a)
+    , data : Array a
+    , sorting : Array Sorting
+    , filters : Array Filter
     , dragging : Maybe String
     }
 
 
-type Msg a
+type Msg
     = Sort String
     | Filter String String
     | DragStart String
     | DragEnd
     | DragOver String
     | Drop
-    | SetData (List a)
+    -- | SetData (List a)
 
 
 zip : List a -> List b -> List ( a, b )
@@ -93,14 +94,14 @@ stepDirection direction =
             Asc
 
 
-findColumn : List (Column a) -> String -> Maybe (Column a)
+findColumn : Array (Column a) -> String -> Maybe (Column a)
 findColumn columns key =
-    List.head <| List.filter (\c -> c.key == key) columns
+    Array.get 0 <| Array.filter (\c -> c.key == key) columns
 
 
-findSorting : List Sorting -> String -> Direction
+findSorting : Array Sorting -> String -> Direction
 findSorting sorting key =
-    case List.head <| List.filter (\s -> first s == key) sorting of
+    case Array.get 0 <| Array.filter (\s -> first s == key) sorting of
         Just s ->
             second s
 
@@ -108,9 +109,9 @@ findSorting sorting key =
             None
 
 
-indexForColumn : String -> List (Column a) -> Maybe Int
+indexForColumn : String -> Array (Column a) -> Maybe Int
 indexForColumn key columns =
-    case List.head <| List.filter (\( i, c ) -> c.key == key) <| List.indexedMap (\i c -> ( i, c )) columns of
+    case Array.get 0 <| Array.filter (\( i, c ) -> c.key == key) <| Array.indexedMap (\i c -> ( i, c )) columns of
         Just ( i, _ ) ->
             Just i
 
@@ -118,11 +119,11 @@ indexForColumn key columns =
             Nothing
 
 
-setOrder : Direction -> List a -> List a
+setOrder : Direction -> Array a -> Array a
 setOrder direction data =
     case direction of
         Desc ->
-            List.reverse data
+            Array.toList data |> List.reverse |> Array.fromList
 
         _ ->
             data
@@ -130,10 +131,10 @@ setOrder direction data =
 
 init : List (Column a) -> List a -> Model a
 init columns data =
-    { dragging = Nothing, columns = columns, data = data, sorting = [], filters = [] }
+    { dragging = Nothing, columns = Array.fromList columns, data = Array.fromList data, sorting = Array.empty, filters = Array.empty }
 
 
-update : Msg a -> Model a -> Model a
+update : Msg -> Model a -> Model a
 update msg model =
     case msg of
         Sort key ->
@@ -144,10 +145,14 @@ update msg model =
                 sorting =
                     case dir of
                         None ->
-                            List.filter (\s -> first s /= key) model.sorting
+                            Array.filter (\s -> first s /= key) model.sorting
 
                         _ ->
-                            List.filter (\s -> first s /= key) model.sorting ++ [ ( key, dir ) ]
+                            let
+                                newSorting = Array.filter (\s -> first s /= key) model.sorting
+                            in
+
+                             Array.push ( key, dir ) newSorting
             in
             { model | sorting = sorting }
 
@@ -156,10 +161,14 @@ update msg model =
                 filters =
                     case s of
                         "" ->
-                            List.filter (\f -> first f /= key) model.filters
+                            Array.filter (\f -> first f /= key) model.filters
 
                         _ ->
-                            List.filter (\f -> first f /= key) model.filters ++ [ ( key, s ) ]
+                            let
+                                newFilters =
+                                    Array.filter (\f -> first f /= key) model.filters
+                            in
+                            Array.push ( key, s ) newFilters
             in
             { model | filters = filters }
 
@@ -177,14 +186,17 @@ update msg model =
                     case model.dragging of
                         Just key ->
                             if key /= target then
-                                case List.head <| List.filter (\c -> c.key == key) model.columns of
+                                case Array.get 0 <| Array.filter (\c -> c.key == key) model.columns of
                                     Just column ->
                                         let
                                             cleaned =
-                                                List.filter (\c -> c.key /= key) model.columns
+                                                Array.filter (\c -> c.key /= key) model.columns
+
+                                            head = Array.slice 0 targetPosition cleaned
+                                            tail = Array.slice (targetPosition + 1) (Array.length cleaned) cleaned
 
                                             columns =
-                                                List.take targetPosition cleaned ++ [ column ] ++ List.drop targetPosition cleaned
+                                                Array.append (Array.push column head) tail
                                         in
                                         { model | columns = columns }
 
@@ -203,16 +215,16 @@ update msg model =
         Drop ->
             { model | dragging = Nothing }
 
-        SetData data ->
-          { model | data = data }
+        -- SetData data ->
+        --     { model | data = Array.fromList data }
 
 
-view : Model a -> (Msg a -> msg) -> Html msg
+view : Model a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
         filtered =
-            List.foldl
-                (\f d ->
+            Array.foldl
+                (\f data ->
                     -- TODO: Investigate a better pattern as this function shows up a second time below.
                     let
                         filterFn =
@@ -221,16 +233,17 @@ view model toMsg =
                                     c.filterFn
 
                                 Nothing ->
-                                    \_ _ -> d
+                                    \_ _ -> True
                     in
-                    filterFn d <| second f
+                    Array.filter (\d -> filterFn d <| second f) data
                 )
                 model.data
                 model.filters
 
+
         sorted =
-            List.foldl
-                (\s d ->
+            Array.foldl
+                (\s data ->
                     -- TODO: It's that function again.
                     let
                         sortFn =
@@ -239,9 +252,10 @@ view model toMsg =
                                     c.sortFn
 
                                 Nothing ->
-                                    \_ -> d
+                                    \_ -> data
+                        dir = second s
                     in
-                    sortFn d |> setOrder (second s)
+                    setOrder dir <| Array.fromList <| List.sortBy (\d -> sortFn d) <| Array.toList data
                 )
                 filtered
                 model.sorting
@@ -260,7 +274,7 @@ view model toMsg =
         ]
 
 
-viewHeaderCells : Model a -> (Msg a -> msg) -> List (Html msg)
+viewHeaderCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewHeaderCells model toMsg =
     List.map
         (\c ->
@@ -283,7 +297,7 @@ viewHeaderCells model toMsg =
         model.columns
 
 
-viewFilterCells : Model a -> (Msg a -> msg) -> List (Html msg)
+viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewFilterCells model toMsg =
     List.map
         (\c ->

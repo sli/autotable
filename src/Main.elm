@@ -16,37 +16,60 @@ type alias Person =
     }
 
 
-stringSort : (Person -> String) -> List Person -> List Person
-stringSort fn data =
-    List.sortBy fn data
+-- stringSort : (Person -> String) -> List Person -> List Person
+-- stringSort fn data =
+--     List.sortBy fn data
 
 
-numberSort : (Person -> Int) -> List Person -> List Person
-numberSort fn data =
-    List.sortBy fn data
+stringSort : (Person -> String) -> Person -> String
+stringSort fn d =
+    fn d
 
 
-stringFilter : (Person -> String) -> List Person -> String -> List Person
-stringFilter fn data s =
+-- numberSort : (Person -> Int) -> List Person -> List Person
+-- numberSort fn data =
+--     List.sortBy fn data
+
+
+numberSort : (Person -> Int) -> Person -> Int
+numberSort fn d =
+    fn d
+
+
+-- stringFilter : (Person -> String) -> List Person -> String -> List Person
+-- stringFilter fn data s =
+--     let
+--         ls =
+--             String.toLower s
+--     in
+--     List.filter (\d -> String.startsWith ls <| String.toLower <| fn d) data
+
+
+stringFilter : (Person -> String) -> Person -> String -> Person
+stringFilter fn d s =
     let
         ls =
             String.toLower s
     in
-    List.filter (\d -> String.startsWith ls <| String.toLower <| fn d) data
+    String.startsWith ls <| String.toLower <| fn d
 
 
-numberFilter : (Person -> Int) -> List Person -> String -> List Person
-numberFilter fn data s =
-    List.filter
-        (\d -> String.startsWith s <| String.fromInt <| fn d)
-        data
+-- numberFilter : (Person -> Int) -> List Person -> String -> List Person
+-- numberFilter fn data s =
+--     List.filter
+--         (\d -> String.startsWith s <| String.fromInt <| fn d)
+--         data
+
+numberFilter : (Person -> Int) -> Person -> String -> Bool
+numberFilter fn d s =
+    String.startsWith s <| String.fromInt <| fn d
 
 
 myColumns : List (AT.Column Person)
 myColumns =
-    [ AT.Column "Name" "name" (\p -> p.name) (stringSort .name) (stringFilter .name)
-    , AT.Column "Age" "age" (\p -> String.fromInt p.age) (numberSort .age) (numberFilter .age)
-    , AT.Column "Cats" "cats" (\p -> String.fromInt p.cats) (numberSort .cats) (numberFilter .cats)
+    [ AT.Column "Name" "name" (\p -> p.name) .name (stringFilter .name)
+    , AT.Column "Age" "age" (\p -> String.fromInt p.age) .age (numberFilter .age)
+    , AT.Column "Cats" "cats" (\p -> String.fromInt p.cats) .cats (numberFilter .cats)
     ]
 
 
