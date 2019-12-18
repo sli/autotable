@@ -12,6 +12,7 @@ pageCss =
             , CG.table
                 [ borderSpacing (px 0)
                 , borderCollapse collapse
+                , borderRadius (px 5)
                 , boxShadow5 (px 0) (px 0) (px 20) (px 2) <| rgba 190 190 190 0.25
                 , margin2 (rem 10.0) auto
                 , padding (px 0)
@@ -27,6 +28,7 @@ pageCss =
                     [ tr
                         [ nthChild "even" [ backgroundColor <| rgba 0 0 0 0.035 ]
                         , borderBottom3 (px 1) solid <| rgba 190 190 190 0.25
+                        , lastChild <| [ borderBottom (px 0) ]
                         ]
                     ]
                 ]

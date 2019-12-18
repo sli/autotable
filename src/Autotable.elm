@@ -31,10 +31,6 @@ type alias Column a =
     }
 
 
-
--- Store a List of these to control a row's mode?
-
-
 type RowMode
     = Viewing
     | Editing
@@ -43,7 +39,6 @@ type RowMode
 type alias Model a =
     { columns : List (Column a)
     , data : List a
-    , rowModes : List RowMode
     , sorting : List Sorting
     , filters : List Filter
     , dragging : Maybe String
@@ -102,19 +97,14 @@ findColumn columns key =
     List.head <| List.filter (\c -> c.key == key) columns
 
 
-findSorting : List Sorting -> String -> Maybe Sorting
+findSorting : List Sorting -> String -> Direction
 findSorting sorting key =
-    List.head <| List.filter (\s -> first s == key) sorting
-
-
-findFilter : List (Column a) -> List Filter -> String -> Maybe Filter
-findFilter columns filters key =
-    case findColumn columns key of
-        Just c ->
-            List.head <| List.filter (\f -> first f == c.key) filters
+    case List.head <| List.filter (\s -> first s == key) sorting of
+        Just s ->
+            second s
 
         Nothing ->
-            Nothing
+            None
 
 
 indexForColumn : String -> List (Column a) -> Maybe Int
@@ -139,7 +129,7 @@ setOrder direction data =
 
 init : List (Column a) -> List a -> Model a
 init columns data =
-    { dragging = Nothing, columns = columns, data = data, rowModes = List.repeat (List.length data) Viewing, sorting = [], filters = [] }
+    { dragging = Nothing, columns = columns, data = data, sorting = [], filters = [] }
 
 
 update : Msg -> Model a -> Model a
@@ -148,12 +138,7 @@ update msg model =
         Sort key ->
             let
                 dir =
-                    case findSorting model.sorting key of
-                        Just v ->
-                            stepDirection (second v)
-
-                        Nothing ->
-                            Asc
+                    findSorting model.sorting key |> stepDirection
 
                 sorting =
                     case dir of
@@ -184,7 +169,8 @@ update msg model =
             { model | dragging = Nothing }
 
         DragOver target ->
-            -- I hate it, but it works for now.
+            -- TODO: I hate it, but it works for now. Find a better way.
+            -- Read the Basic.Maybe docs, ya ding dong.
             case indexForColumn target model.columns of
                 Just targetPosition ->
                     case model.dragging of
@@ -223,6 +209,7 @@ view model toMsg =
         filtered =
             List.foldl
                 (\f d ->
+                    -- TODO: Investigate a better pattern as this function shows up a second time below.
                     let
                         filterFn =
                             case findColumn model.columns (first f) of
@@ -240,6 +227,7 @@ view model toMsg =
         sorted =
             List.foldl
                 (\s d ->
+                    -- TODO: It's that function again.
                     let
                         sortFn =
                             case findColumn model.columns (first s) of
@@ -274,12 +262,7 @@ viewHeaderCells model toMsg =
         (\c ->
             let
                 sorting =
-                    case findSorting model.sorting c.key of
-                        Just s ->
-                            viewDirection <| second s
-
-                        Nothing ->
-                            ""
+                    findSorting model.sorting c.key |> viewDirection
             in
             th
                 [ onClick <| toMsg <| Sort c.key
@@ -315,13 +298,12 @@ viewBodyRows : Model a -> List a -> List (Html msg)
 viewBodyRows model data =
     let
         buildRow row =
-            List.map
-                (\c -> td [ class "text-left" ] [ text <| c.render row ])
-                model.columns
+            tr [] <|
+                List.map
+                    (\c -> td [ class "text-left" ] [ text <| c.render row ])
+                    model.columns
     in
-    List.map
-        (\d -> tr [] <| buildRow d)
-        data
+    List.map buildRow data
 
 
 viewDirection : Direction -> String
