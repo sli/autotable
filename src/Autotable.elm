@@ -45,14 +45,13 @@ type alias Model a =
     }
 
 
-type Msg a
+type Msg
     = Sort String
     | Filter String String
     | DragStart String
     | DragEnd
     | DragOver String
     | Drop
-    | SetData (List a)
 
 
 zip : List a -> List b -> List ( a, b )
@@ -133,7 +132,7 @@ init columns data =
     { dragging = Nothing, columns = columns, data = data, sorting = [], filters = [] }
 
 
-update : Msg a -> Model a -> Model a
+update : Msg -> Model a -> Model a
 update msg model =
     case msg of
         Sort key ->
@@ -203,11 +202,8 @@ update msg model =
         Drop ->
             { model | dragging = Nothing }
 
-        SetData data ->
-          { model | data = data }
 
-
-view : Model a -> (Msg a -> msg) -> Html msg
+view : Model a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
         filtered =
@@ -260,7 +256,7 @@ view model toMsg =
         ]
 
 
-viewHeaderCells : Model a -> (Msg a -> msg) -> List (Html msg)
+viewHeaderCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewHeaderCells model toMsg =
     List.map
         (\c ->
@@ -283,7 +279,7 @@ viewHeaderCells model toMsg =
         model.columns
 
 
-viewFilterCells : Model a -> (Msg a -> msg) -> List (Html msg)
+viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewFilterCells model toMsg =
     List.map
         (\c ->
