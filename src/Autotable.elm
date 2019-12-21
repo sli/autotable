@@ -14,14 +14,12 @@ type Direction
     | Desc
     | None
 
-
 type alias Sorting =
     ( String, Direction )
 
 
 type alias Filter =
     ( String, String )
-
 
 type alias Column a =
     { label : String
@@ -53,7 +51,10 @@ type Msg
     | DragEnd
     | DragOver String
     | Drop
-    -- | SetData (List a)
+
+
+
+-- | SetData (List a)
 
 
 zip : List a -> List b -> List ( a, b )
@@ -149,10 +150,10 @@ update msg model =
 
                         _ ->
                             let
-                                newSorting = Array.filter (\s -> first s /= key) model.sorting
+                                newSorting =
+                                    Array.filter (\s -> first s /= key) model.sorting
                             in
-
-                             Array.push ( key, dir ) newSorting
+                            Array.push ( key, dir ) newSorting
             in
             { model | sorting = sorting }
 
@@ -192,8 +193,11 @@ update msg model =
                                             cleaned =
                                                 Array.filter (\c -> c.key /= key) model.columns
 
-                                            head = Array.slice 0 targetPosition cleaned
-                                            tail = Array.slice (targetPosition + 1) (Array.length cleaned) cleaned
+                                            head =
+                                                Array.slice 0 targetPosition cleaned
+
+                                            tail =
+                                                Array.slice (targetPosition + 1) (Array.length cleaned) cleaned
 
                                             columns =
                                                 Array.append (Array.push column head) tail
@@ -215,8 +219,10 @@ update msg model =
         Drop ->
             { model | dragging = Nothing }
 
-        -- SetData data ->
-        --     { model | data = Array.fromList data }
+
+
+-- SetData data ->
+--     { model | data = Array.fromList data }
 
 
 view : Model a -> (Msg -> msg) -> Html msg
@@ -240,25 +246,29 @@ view model toMsg =
                 model.data
                 model.filters
 
-
         sorted =
-            Array.foldl
-                (\s data ->
-                    -- TODO: It's that function again.
-                    let
-                        sortFn =
-                            case findColumn model.columns (first s) of
-                                Just c ->
-                                    c.sortFn
+            filtered
 
-                                Nothing ->
-                                    \_ -> data
-                        dir = second s
-                    in
-                    setOrder dir <| Array.fromList <| List.sortBy (\d -> sortFn d) <| Array.toList data
-                )
-                filtered
-                model.sorting
+        -- sorted =
+        --     Array.foldl
+        --         (\s data ->
+        --             -- TODO: It's that function again.
+        --             let
+        --                 sortFn =
+        --                     case findColumn model.columns (first s) of
+        --                         Just c ->
+        --                             c.sortFn
+        --
+        --                         Nothing ->
+        --                             \_ -> data
+        --
+        --                 dir =
+        --                     second s
+        --             in
+        --             setOrder dir <| Array.fromList <| List.sortBy (\d -> sortFn d) <| Array.toList data
+        --         )
+        --         filtered
+        --         model.sorting
     in
     div []
         [ pageCss
@@ -276,52 +286,61 @@ view model toMsg =
 
 viewHeaderCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewHeaderCells model toMsg =
-    List.map
-        (\c ->
-            let
-                sorting =
-                    findSorting model.sorting c.key |> viewDirection
-            in
-            th
-                [ onClick <| toMsg <| Sort c.key
-                , onDragStart <| toMsg <| DragStart c.key
-                , onDragEnd <| toMsg DragEnd
-                , onDragOver <| toMsg <| DragOver c.key
-                , Html.Attributes.draggable "true"
-                , style "user-select" "none"
-                ]
-                [ text <| c.label
-                , span [ class "sort-indicator" ] [ text sorting ]
-                ]
-        )
-        model.columns
+    let
+        headerCells =
+            Array.map
+                (\c ->
+                    let
+                        sorting =
+                            findSorting model.sorting c.key |> viewDirection
+                    in
+                    th
+                        [ onClick <| toMsg <| Sort c.key
+                        , onDragStart <| toMsg <| DragStart c.key
+                        , onDragEnd <| toMsg DragEnd
+                        , onDragOver <| toMsg <| DragOver c.key
+                        , Html.Attributes.draggable "true"
+                        , style "user-select" "none"
+                        ]
+                        [ text <| c.label
+                        , span [ class "sort-indicator" ] [ text sorting ]
+                        ]
+                )
+                model.columns
+    in
+    Array.toList headerCells
 
 
 viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
 viewFilterCells model toMsg =
-    List.map
-        (\c ->
-            let
-                inputHandler s =
-                    toMsg <| Filter c.key s
-            in
-            th []
-                [ input [ type_ "text", placeholder "Filter", onInput inputHandler ] []
-                ]
-        )
-        model.columns
+    let
+        filterCells =
+            Array.map
+                (\c ->
+                    let
+                        inputHandler s =
+                            toMsg <| Filter c.key s
+                    in
+                    th []
+                        [ input [ type_ "text", placeholder "Filter", onInput inputHandler ] []
+                        ]
+                )
+                model.columns
+    in
+    Array.toList filterCells
 
 
-viewBodyRows : Model a -> List a -> List (Html msg)
+viewBodyRows : Model a -> Array a -> List (Html msg)
 viewBodyRows model data =
     let
         buildRow row =
             tr [] <|
-                List.map
-                    (\c -> td [ class "text-left" ] [ text <| c.render row ])
-                    model.columns
+                Array.toList <|
+                    Array.map
+                        (\c -> td [ class "text-left" ] [ text <| c.render row ])
+                        model.columns
     in
-    List.map buildRow data
+    Array.toList <| Array.map buildRow data
 
 
 viewDirection : Direction -> String
