@@ -67,11 +67,8 @@ zip xs ys =
 arrayInsert : Array a -> Int -> a -> Array a
 arrayInsert data index item =
     let
-        toInsert =
-            Array.fromList [ item ]
-
         head =
-            Array.append (Array.slice 0 index data) toInsert
+            Array.push item (Array.slice 0 index data)
 
         tail =
             Array.slice index (Array.length data) data
