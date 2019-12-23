@@ -1,7 +1,7 @@
 module Autotable exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, Attribute, a, div, input, span, table, tbody, td, text, th, thead, tr)
+import Html exposing (Attribute, Html, a, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, placeholder, style, type_)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as D
