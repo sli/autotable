@@ -1,7 +1,7 @@
 module Autotable exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, a, div, input, span, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, Attribute, a, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, placeholder, style, type_)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as D
@@ -79,22 +79,22 @@ arrayInsert data index item =
     Array.append head tail
 
 
-onDragStart : msg -> Html.Attribute msg
+onDragStart : msg -> Attribute msg
 onDragStart msg =
     on "dragstart" <| D.succeed msg
 
 
-onDragEnd : msg -> Html.Attribute msg
+onDragEnd : msg -> Attribute msg
 onDragEnd msg =
     on "dragend" <| D.succeed msg
 
 
-onDragOver : msg -> Html.Attribute msg
+onDragOver : msg -> Attribute msg
 onDragOver msg =
     on "dragover" <| D.succeed msg
 
 
-onDrop : msg -> Html.Attribute msg
+onDrop : msg -> Attribute msg
 onDrop msg =
     on "drop" <| D.succeed msg
 
@@ -210,7 +210,8 @@ update msg model =
                                             cleaned =
                                                 Array.filter (\c -> c.key /= key) model.columns
 
-                                            columns = arrayInsert cleaned targetPosition column
+                                            columns =
+                                                arrayInsert cleaned targetPosition column
                                         in
                                         { model | columns = columns }
 
