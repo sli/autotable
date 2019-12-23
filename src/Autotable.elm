@@ -14,12 +14,14 @@ type Direction
     | Desc
     | None
 
+
 type alias Sorting =
     ( String, Direction )
 
 
 type alias Filter =
     ( String, String )
+
 
 type alias Column a =
     { label : String
@@ -60,6 +62,21 @@ type Msg
 zip : List a -> List b -> List ( a, b )
 zip xs ys =
     List.map2 Tuple.pair xs ys
+
+
+arrayInsert : Array a -> Int -> a -> Array a
+arrayInsert data index item =
+    let
+        toInsert =
+            Array.fromList [ item ]
+
+        head =
+            Array.append (Array.slice 0 index data) toInsert
+
+        tail =
+            Array.slice index (Array.length data) data
+    in
+    Array.append head tail
 
 
 onDragStart : msg -> Html.Attribute msg
@@ -193,14 +210,7 @@ update msg model =
                                             cleaned =
                                                 Array.filter (\c -> c.key /= key) model.columns
 
-                                            head =
-                                                Array.slice 0 targetPosition cleaned
-
-                                            tail =
-                                                Array.slice (targetPosition + 1) (Array.length cleaned) cleaned
-
-                                            columns =
-                                                Array.append (Array.push column head) tail
+                                            columns = arrayInsert cleaned targetPosition column
                                         in
                                         { model | columns = columns }
 
