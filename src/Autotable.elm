@@ -233,9 +233,73 @@ update msg model =
 --     { model | data = Array.fromList data }
 
 
+sorter : (a -> String) -> Array a -> Int -> Int -> Order
+sorter sortFn data a b =
+    let
+        ca =
+            case Array.get a data of
+                Just r ->
+                    sortFn r
+
+                Nothing ->
+                    ""
+
+        cb =
+            case Array.get b data of
+                Just r ->
+                    sortFn r
+
+                Nothing ->
+                    ""
+    in
+    compare ca cb
+
+
 view : Model a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
+        indexes =
+            Array.initialize (Array.length model.data) identity
+
+        filteredIndexes =
+            Array.foldl
+                (\f data ->
+                    case findColumn model.columns (first f) of
+                        Just c ->
+                            Array.filter
+                                (\d ->
+                                    case Array.get d model.data of
+                                        Just r ->
+                                            c.filterFn r <| second f
+
+                                        Nothing ->
+                                            False
+                                )
+                                data
+
+                        Nothing ->
+                            data
+                )
+                indexes
+                model.filters
+
+        sortedIndexes =
+            Array.foldl
+                (\s data ->
+                    let
+                        dir =
+                            second s
+                    in
+                    case findColumn model.columns (first s) of
+                        Just c ->
+                            setOrder dir <| List.sortWith (sorter c.sortFn model.data) data
+
+                        Nothing ->
+                            data
+                )
+                (Array.toList filteredIndexes)
+                model.sorting
+
         filtered =
             Array.foldl
                 (\f data ->
