@@ -134,11 +134,11 @@ indexForColumn key columns =
             Nothing
 
 
-setOrder : Direction -> Array a -> Array a
+setOrder : Direction -> List a -> List a
 setOrder direction data =
     case direction of
         Desc ->
-            Array.toList data |> List.reverse |> Array.fromList
+            List.reverse data
 
         _ ->
             data
@@ -250,18 +250,21 @@ view model toMsg =
                 model.filters
 
         sorted =
-            Array.fromList <|
-                Array.foldl
-                    (\s data ->
-                        case findColumn model.columns (first s) of
-                            Just c ->
-                                List.sortBy c.sortFn data
+            Array.foldl
+                (\s data ->
+                    let
+                        dir =
+                            second s
+                    in
+                    case findColumn model.columns (first s) of
+                        Just c ->
+                            setOrder dir <| List.sortBy c.sortFn data
 
-                            Nothing ->
-                                data
-                    )
-                    (Array.toList filtered)
-                    model.sorting
+                        Nothing ->
+                            data
+                )
+                (Array.toList filtered)
+                model.sorting
     in
     div []
         [ pageCss
@@ -323,7 +326,7 @@ viewFilterCells model toMsg =
     Array.toList filterCells
 
 
-viewBodyRows : Model a -> Array a -> List (Html msg)
+viewBodyRows : Model a -> List a -> List (Html msg)
 viewBodyRows model data =
     let
         buildRow row =
@@ -333,7 +336,7 @@ viewBodyRows model data =
                         (\c -> td [ class "text-left" ] [ text <| c.render row ])
                         model.columns
     in
-    Array.toList <| Array.map buildRow data
+    List.map buildRow data
 
 
 viewDirection : Direction -> String
