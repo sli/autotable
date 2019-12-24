@@ -1,19 +1,22 @@
 # autotable
 
-An in-development datatable for Elm.
+An in-development datatable for Elm. The code is not very good, but it should
+work well for simple things.
 
 ## Todo
 
+* Decouple filter/sorting/editing from data.
 * Row-level editing.
-* Separate a column's sorting state from the data itself so sorting can be
-  removed from a column. Sorts can currently be cleared but they clear to the
-  Ascending direction.
+
+## Running Demo
+
+`$ yarn install && yarn start`
 
 ## Usage
 
 Can't, for the time being, since it's not published. But if you pull this code
-to use it, don't forget you need a little Javascript. It can be found in
-`static/index.html` but I'll put it here, too.
+to use it, don't forget you'll need a little Javascript. It can be found in
+`static/index.html`, but I'll put it here, too.
 
 ```js
 document.body.addEventListener('dragstart', e =>
@@ -32,8 +35,8 @@ modes can be controlled using the indexes without ever touching the data
 itself.
 
 The way to implement this seems like generating the indexes, and having generic
-filter functions that map between indexes and elements in the dataset to apply
-the user-specified `sortFn`.
+filter/sort functions that map between indexes and elements in the dataset to
+apply the user-specified `sortFn`.
 
 Or, keep the data as a `List` and convert to `Array` when rendering to keep
 `List` ergonomics? Tests will have to be done.
