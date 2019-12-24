@@ -239,44 +239,29 @@ view model toMsg =
         filtered =
             Array.foldl
                 (\f data ->
-                    -- TODO: Investigate a better pattern as this function shows up a second time below.
-                    let
-                        filterFn =
-                            case findColumn model.columns (first f) of
-                                Just c ->
-                                    c.filterFn
+                    case findColumn model.columns (first f) of
+                        Just c ->
+                            Array.filter (\d -> c.filterFn d <| second f) data
 
-                                Nothing ->
-                                    \_ _ -> True
-                    in
-                    Array.filter (\d -> filterFn d <| second f) data
+                        Nothing ->
+                            data
                 )
                 model.data
                 model.filters
 
         sorted =
-            filtered
+            Array.fromList <|
+                Array.foldl
+                    (\s data ->
+                        case findColumn model.columns (first s) of
+                            Just c ->
+                                List.sortBy c.sortFn data
 
-        -- sorted =
-        --     Array.foldl
-        --         (\s data ->
-        --             -- TODO: It's that function again.
-        --             let
-        --                 sortFn =
-        --                     case findColumn model.columns (first s) of
-        --                         Just c ->
-        --                             c.sortFn
-        --
-        --                         Nothing ->
-        --                             \_ -> data
-        --
-        --                 dir =
-        --                     second s
-        --             in
-        --             setOrder dir <| Array.fromList <| List.sortBy (\d -> sortFn d) <| Array.toList data
-        --         )
-        --         filtered
-        --         model.sorting
+                            Nothing ->
+                                data
+                    )
+                    (Array.toList filtered)
+                    model.sorting
     in
     div []
         [ pageCss
