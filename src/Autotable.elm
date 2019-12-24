@@ -1,7 +1,7 @@
 module Autotable exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Attribute, Html, a, div, input, span, table, tbody, td, text, th, thead, tr)
+import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, placeholder, style, type_)
 import Html.Events exposing (on, onClick, onInput)
 import Json.Decode as D
@@ -43,6 +43,7 @@ type alias Model a =
     , sorting : Array Sorting
     , filters : Array Filter
     , dragging : Maybe String
+    , editing : List Int
     }
 
 
@@ -53,6 +54,7 @@ type Msg
     | DragEnd
     | DragOver String
     | Drop
+    | ToggleEdit Int
 
 
 
@@ -146,7 +148,7 @@ setOrder direction data =
 
 init : List (Column a) -> List a -> Model a
 init columns data =
-    { dragging = Nothing, columns = Array.fromList columns, data = Array.fromList data, sorting = Array.empty, filters = Array.empty }
+    { dragging = Nothing, columns = Array.fromList columns, data = Array.fromList data, sorting = Array.empty, filters = Array.empty, editing = [] }
 
 
 update : Msg -> Model a -> Model a
@@ -227,6 +229,14 @@ update msg model =
         Drop ->
             { model | dragging = Nothing }
 
+        ToggleEdit index ->
+            case List.head <| List.filter (\i -> i == index) model.editing of
+                Just found ->
+                    { model | editing = List.filter (\i -> i /= index) model.editing }
+
+                Nothing ->
+                    { model | editing = index :: model.editing }
+
 
 
 -- SetData data ->
@@ -299,36 +309,6 @@ view model toMsg =
                 )
                 (Array.toList filteredIndexes)
                 model.sorting
-
-        filtered =
-            Array.foldl
-                (\f data ->
-                    case findColumn model.columns (first f) of
-                        Just c ->
-                            Array.filter (\d -> c.filterFn d <| second f) data
-
-                        Nothing ->
-                            data
-                )
-                model.data
-                model.filters
-
-        sorted =
-            Array.foldl
-                (\s data ->
-                    let
-                        dir =
-                            second s
-                    in
-                    case findColumn model.columns (first s) of
-                        Just c ->
-                            setOrder dir <| List.sortBy c.sortFn data
-
-                        Nothing ->
-                            data
-                )
-                (Array.toList filtered)
-                model.sorting
     in
     div []
         [ pageCss
@@ -339,7 +319,7 @@ view model toMsg =
                 [ tr [] <| viewHeaderCells model toMsg
                 , tr [] <| viewFilterCells model toMsg
                 ]
-            , tbody [] <| viewBodyRows model sorted
+            , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
         ]
 
@@ -368,7 +348,7 @@ viewHeaderCells model toMsg =
                 )
                 model.columns
     in
-    Array.toList headerCells
+    Array.toList headerCells ++ [ th [ style "width" "5%" ] [] ]
 
 
 viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
@@ -387,20 +367,25 @@ viewFilterCells model toMsg =
                 )
                 model.columns
     in
-    Array.toList filterCells
+    Array.toList filterCells ++ [ th [ style "width" "5%" ] [] ]
 
 
-viewBodyRows : Model a -> List a -> List (Html msg)
-viewBodyRows model data =
+viewBodyRows : Model a -> List Int -> (Msg -> msg) -> List (Html msg)
+viewBodyRows model indexes toMsg =
     let
-        buildRow row =
+        rows =
+            List.filterMap (\i -> Array.get i model.data) indexes
+
+        buildRow index row =
             tr [] <|
-                Array.toList <|
+                (Array.toList <|
                     Array.map
                         (\c -> td [ class "text-left" ] [ text <| c.render row ])
                         model.columns
+                )
+                    ++ [ td [] [ button [ onClick <| toMsg <| ToggleEdit index ] [ text "Edit" ] ] ]
     in
-    List.map buildRow data
+    List.indexedMap buildRow rows
 
 
 viewDirection : Direction -> String
