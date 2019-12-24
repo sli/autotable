@@ -31,6 +31,10 @@ rows / pairs of rows, respectively. That way the filtering, sorting, and row
 modes can be controlled using the indexes without ever touching the data
 itself.
 
+The way to implement this seems like generating the indexes, and having generic
+filter functions that map between indexes and elements in the dataset to apply
+the user-specified `sortFn`.
+
 Or, keep the data as a `List` and convert to `Array` when rendering to keep
 `List` ergonomics? Tests will have to be done.
 
