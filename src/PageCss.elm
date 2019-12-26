@@ -1,15 +1,14 @@
 module PageCss exposing (..)
 
 import Css exposing (..)
-import Css.Global as CG exposing (..)
+import Css.Global exposing (..)
 import Html.Styled exposing (toUnstyled)
-
 
 pageCss =
     toUnstyled <|
         global
             [ body [ fontFamily sansSerif ]
-            , CG.table
+            , selector "table.autotable"
                 [ borderSpacing (px 0)
                 , borderCollapse collapse
                 , borderRadius (px 5)
@@ -38,10 +37,22 @@ pageCss =
                 [ marginLeft (px 10)
                 , fontSize (pt 10)
                 ]
-            , input
-                [ borderRadius (px 2)
-                , border (px 1)
-                , borderColor <| rgb 0 0 0
-                , padding (rem 0.25)
+            , selector "table.autotable tr.filter-inputs th > input"
+                [ borderRadius (px 3)
+                , borderColor <| rgba 0 0 0 0.1
                 ]
+            , input
+                [ borderRadius (px 3)
+                , border3 (px 1) solid <| rgb 0 0 0
+                , padding (rem 0.25)
+                , fontSize (pt 12)
+                ]
+            , button
+              [ borderRadius (px 3)
+              , border (px 0)
+              , padding (rem 0.5)
+              , color <| rgb 255 255 255
+              , fontSize (pt 12)
+              , backgroundColor <| hex "63B3ED"
+              ]
             ]

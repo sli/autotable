@@ -321,11 +321,11 @@ view model toMsg =
     div []
         [ pageCss
         , table
-            [ class "w-full" ]
+            [ class "autotable" ]
             [ thead
                 [ class "bg-gray-900 text-white" ]
                 [ tr [] <| viewHeaderCells model toMsg
-                , tr [] <| viewFilterCells model toMsg
+                , tr [ class "filter-inputs" ] <| viewFilterCells model toMsg
                 ]
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
