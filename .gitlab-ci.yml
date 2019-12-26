@@ -1,0 +1,16 @@
+image: node
+
+test_build:
+  only:
+    changes:
+      - src/**/*
+      - .gitlab-ci.yml
+      - elm.json
+      - package.json
+  artifacts:
+    paths:
+    - dist/
+    expire_in: 1 week
+  script:
+    - yarn
+    - yarn build:dist
