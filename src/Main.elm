@@ -45,7 +45,7 @@ myColumns =
     [ AT.Column
         "Name"
         "name"
-        (\p -> p.name)
+        .name
         (\p -> input [ type_ "text", value p.name ] [])
         .name
         (stringFilter .name)
