@@ -40,7 +40,7 @@ numberFilter fn d s =
     String.startsWith s <| String.fromInt <| fn d
 
 
-myColumns : List (AT.Column Person Msg)
+myColumns : List (AT.Column Msg Person)
 myColumns =
     [ AT.Column
         "Name"
@@ -83,7 +83,7 @@ myData =
 
 
 type alias Model =
-    { tableState : AT.Model Person Msg }
+    { tableState : AT.Model Msg Person }
 
 
 type Msg
