@@ -67,18 +67,6 @@ zip xs ys =
     List.map2 Tuple.pair xs ys
 
 
-arrayInsert : Array a -> Int -> a -> Array a
-arrayInsert data index item =
-    let
-        head =
-            Array.push item (Array.slice 0 index data)
-
-        tail =
-            Array.slice index (Array.length data) data
-    in
-    Array.append head tail
-
-
 listInsert : List a -> Int -> a -> List a
 listInsert data index item =
     List.concat
