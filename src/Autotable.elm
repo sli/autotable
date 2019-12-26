@@ -76,6 +76,16 @@ listInsert data index item =
         ]
 
 
+listContains : a -> List a -> Bool
+listContains item list =
+    case List.head <| List.filter (\i -> i == item) list of
+        Just found ->
+            True
+
+        Nothing ->
+            False
+
+
 onDragStart : msg -> Attribute msg
 onDragStart msg =
     on "dragstart" <| D.succeed msg
@@ -377,11 +387,27 @@ viewBodyRows model indexes toMsg =
         buildRow index row =
             tr [] <|
                 List.map
-                    (\c -> td [ class "text-left" ] [ text <| c.render row ])
+                    (\c ->
+                        if listContains index model.editing then
+                            viewEditRow c row
+
+                        else
+                            viewDisplayRow c row
+                    )
                     model.columns
                     ++ [ td [] [ button [ onClick <| toMsg <| ToggleEdit index ] [ text "Edit" ] ] ]
     in
     List.indexedMap buildRow rows
+
+
+viewDisplayRow : Column msg a -> a -> Html msg
+viewDisplayRow column row =
+    td [ class "text-left" ] [ text <| column.render row ]
+
+
+viewEditRow : Column msg a -> a -> Html msg
+viewEditRow column row =
+    td [ class "text-left" ] [ column.editRender row ]
 
 
 viewDirection : Direction -> String
