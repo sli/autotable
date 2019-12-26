@@ -39,10 +39,10 @@ type RowMode
 
 
 type alias Model a msg =
-    { columns : Array (Column a msg)
+    { columns : List (Column a msg)
     , data : Array a
-    , sorting : Array Sorting
-    , filters : Array Filter
+    , sorting : List Sorting
+    , filters : List Filter
     , dragging : Maybe String
     , editing : List Int
     }
@@ -79,6 +79,15 @@ arrayInsert data index item =
     Array.append head tail
 
 
+listInsert : List a -> Int -> a -> List a
+listInsert data index item =
+    List.concat
+        [ List.take index data
+        , [ item ]
+        , List.drop (index + 1) data
+        ]
+
+
 onDragStart : msg -> Attribute msg
 onDragStart msg =
     on "dragstart" <| D.succeed msg
@@ -112,14 +121,14 @@ stepDirection direction =
             Asc
 
 
-findColumn : Array (Column a msg) -> String -> Maybe (Column a msg)
+findColumn : List (Column a msg) -> String -> Maybe (Column a msg)
 findColumn columns key =
-    Array.get 0 <| Array.filter (\c -> c.key == key) columns
+    List.head <| List.filter (\c -> c.key == key) columns
 
 
-findSorting : Array Sorting -> String -> Direction
+findSorting : List Sorting -> String -> Direction
 findSorting sorting key =
-    case Array.get 0 <| Array.filter (\s -> first s == key) sorting of
+    case List.head <| List.filter (\s -> first s == key) sorting of
         Just s ->
             second s
 
@@ -127,9 +136,9 @@ findSorting sorting key =
             None
 
 
-indexForColumn : String -> Array (Column a msg) -> Maybe Int
+indexForColumn : String -> List (Column a msg) -> Maybe Int
 indexForColumn key columns =
-    case Array.get 0 <| Array.filter (\( i, c ) -> c.key == key) <| Array.indexedMap (\i c -> ( i, c )) columns of
+    case List.head <| List.filter (\( i, c ) -> c.key == key) <| List.indexedMap (\i c -> ( i, c )) columns of
         Just ( i, _ ) ->
             Just i
 
@@ -149,7 +158,7 @@ setOrder direction data =
 
 init : List (Column a msg) -> List a -> Model a msg
 init columns data =
-    { dragging = Nothing, columns = Array.fromList columns, data = Array.fromList data, sorting = Array.empty, filters = Array.empty, editing = [] }
+    { dragging = Nothing, columns = columns, data = Array.fromList data, sorting = [], filters = [], editing = [] }
 
 
 update : Msg -> Model a msg -> Model a msg
@@ -163,14 +172,14 @@ update msg model =
                 sorting =
                     case dir of
                         None ->
-                            Array.filter (\s -> first s /= key) model.sorting
+                            List.filter (\s -> first s /= key) model.sorting
 
                         _ ->
                             let
                                 newSorting =
-                                    Array.filter (\s -> first s /= key) model.sorting
+                                    List.filter (\s -> first s /= key) model.sorting
                             in
-                            Array.push ( key, dir ) newSorting
+                            List.append newSorting [ ( key, dir ) ]
             in
             { model | sorting = sorting }
 
@@ -179,14 +188,14 @@ update msg model =
                 filters =
                     case s of
                         "" ->
-                            Array.filter (\f -> first f /= key) model.filters
+                            List.filter (\f -> first f /= key) model.filters
 
                         _ ->
                             let
                                 newFilters =
-                                    Array.filter (\f -> first f /= key) model.filters
+                                    List.filter (\f -> first f /= key) model.filters
                             in
-                            Array.push ( key, s ) newFilters
+                            List.append newFilters [ ( key, s ) ]
             in
             { model | filters = filters }
 
@@ -204,14 +213,14 @@ update msg model =
                     case model.dragging of
                         Just key ->
                             if key /= target then
-                                case Array.get 0 <| Array.filter (\c -> c.key == key) model.columns of
+                                case List.head <| List.filter (\c -> c.key == key) model.columns of
                                     Just column ->
                                         let
                                             cleaned =
-                                                Array.filter (\c -> c.key /= key) model.columns
+                                                List.filter (\c -> c.key /= key) model.columns
 
                                             columns =
-                                                arrayInsert cleaned targetPosition column
+                                                listInsert cleaned targetPosition column
                                         in
                                         { model | columns = columns }
 
@@ -273,7 +282,7 @@ view model toMsg =
             Array.initialize (Array.length model.data) identity
 
         filteredIndexes =
-            Array.foldl
+            List.foldl
                 (\f data ->
                     case findColumn model.columns (first f) of
                         Just c ->
@@ -295,7 +304,7 @@ view model toMsg =
                 model.filters
 
         sortedIndexes =
-            Array.foldl
+            List.foldl
                 (\s data ->
                     let
                         dir =
@@ -329,7 +338,7 @@ viewHeaderCells : Model a msg -> (Msg -> msg) -> List (Html msg)
 viewHeaderCells model toMsg =
     let
         headerCells =
-            Array.map
+            List.map
                 (\c ->
                     let
                         sorting =
@@ -349,14 +358,14 @@ viewHeaderCells model toMsg =
                 )
                 model.columns
     in
-    Array.toList headerCells ++ [ th [ style "width" "5%" ] [] ]
+    List.append headerCells [ th [ style "width" "5%" ] [] ]
 
 
 viewFilterCells : Model a msg -> (Msg -> msg) -> List (Html msg)
 viewFilterCells model toMsg =
     let
         filterCells =
-            Array.map
+            List.map
                 (\c ->
                     let
                         inputHandler s =
@@ -368,7 +377,7 @@ viewFilterCells model toMsg =
                 )
                 model.columns
     in
-    Array.toList filterCells ++ [ th [ style "width" "5%" ] [] ]
+    List.append filterCells [ th [ style "width" "5%" ] [] ]
 
 
 viewBodyRows : Model a msg -> List Int -> (Msg -> msg) -> List (Html msg)
@@ -379,11 +388,9 @@ viewBodyRows model indexes toMsg =
 
         buildRow index row =
             tr [] <|
-                (Array.toList <|
-                    Array.map
-                        (\c -> td [ class "text-left" ] [ text <| c.render row ])
-                        model.columns
-                )
+                List.map
+                    (\c -> td [ class "text-left" ] [ text <| c.render row ])
+                    model.columns
                     ++ [ td [] [ button [ onClick <| toMsg <| ToggleEdit index ] [ text "Edit" ] ] ]
     in
     List.indexedMap buildRow rows
