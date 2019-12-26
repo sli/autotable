@@ -2,8 +2,8 @@ module Main exposing (..)
 
 import Autotable as AT
 import Browser
-import Html exposing (Html, a, div, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class)
+import Html exposing (Html, a, div, input, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick)
 import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
@@ -40,11 +40,29 @@ numberFilter fn d s =
     String.startsWith s <| String.fromInt <| fn d
 
 
-myColumns : List (AT.Column Person)
+myColumns : List (AT.Column Person Msg)
 myColumns =
-    [ AT.Column "Name" "name" (\p -> p.name) .name (stringFilter .name)
-    , AT.Column "Age" "age" (\p -> String.fromInt p.age) (numberSort .age) (numberFilter .age)
-    , AT.Column "Cats" "cats" (\p -> String.fromInt p.cats) (numberSort .cats) (numberFilter .cats)
+    [ AT.Column
+        "Name"
+        "name"
+        (\p -> p.name)
+        (\p -> input [ type_ "text", value p.name ] [])
+        .name
+        (stringFilter .name)
+    , AT.Column
+        "Age"
+        "age"
+        (\p -> String.fromInt p.age)
+        (\p -> input [ type_ "text", value <| String.fromInt p.age ] [])
+        (numberSort .age)
+        (numberFilter .age)
+    , AT.Column
+        "Cats"
+        "cats"
+        (\p -> String.fromInt p.cats)
+        (\p -> input [ type_ "text", value <| String.fromInt p.cats ] [])
+        (numberSort .cats)
+        (numberFilter .cats)
     ]
 
 
@@ -64,8 +82,8 @@ myData =
     ]
 
 
-type alias Model a =
-    { tableState : AT.Model a }
+type alias Model =
+    { tableState : AT.Model Person Msg }
 
 
 type Msg
@@ -73,12 +91,12 @@ type Msg
     | TableMsg AT.Msg
 
 
-init : () -> ( Model Person, Cmd Msg )
+init : () -> ( Model, Cmd Msg )
 init () =
     ( { tableState = AT.init myColumns myData }, Cmd.none )
 
 
-update : Msg -> Model a -> ( Model a, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
@@ -88,7 +106,7 @@ update msg model =
             ( { model | tableState = AT.update tableMsg model.tableState }, Cmd.none )
 
 
-view : Model a -> Html Msg
+view : Model -> Html Msg
 view model =
     div []
         [ pageCss
@@ -96,7 +114,7 @@ view model =
         ]
 
 
-subscriptions : Model a -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
 

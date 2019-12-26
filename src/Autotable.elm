@@ -23,10 +23,11 @@ type alias Filter =
     ( String, String )
 
 
-type alias Column a =
+type alias Column a msg =
     { label : String
     , key : String
     , render : a -> String
+    , editRender : a -> Html msg
     , sortFn : a -> String
     , filterFn : a -> String -> Bool
     }
@@ -37,8 +38,8 @@ type RowMode
     | Editing
 
 
-type alias Model a =
-    { columns : Array (Column a)
+type alias Model a msg =
+    { columns : Array (Column a msg)
     , data : Array a
     , sorting : Array Sorting
     , filters : Array Filter
@@ -111,7 +112,7 @@ stepDirection direction =
             Asc
 
 
-findColumn : Array (Column a) -> String -> Maybe (Column a)
+findColumn : Array (Column a msg) -> String -> Maybe (Column a msg)
 findColumn columns key =
     Array.get 0 <| Array.filter (\c -> c.key == key) columns
 
@@ -126,7 +127,7 @@ findSorting sorting key =
             None
 
 
-indexForColumn : String -> Array (Column a) -> Maybe Int
+indexForColumn : String -> Array (Column a msg) -> Maybe Int
 indexForColumn key columns =
     case Array.get 0 <| Array.filter (\( i, c ) -> c.key == key) <| Array.indexedMap (\i c -> ( i, c )) columns of
         Just ( i, _ ) ->
@@ -146,12 +147,12 @@ setOrder direction data =
             data
 
 
-init : List (Column a) -> List a -> Model a
+init : List (Column a msg) -> List a -> Model a msg
 init columns data =
     { dragging = Nothing, columns = Array.fromList columns, data = Array.fromList data, sorting = Array.empty, filters = Array.empty, editing = [] }
 
 
-update : Msg -> Model a -> Model a
+update : Msg -> Model a msg -> Model a msg
 update msg model =
     case msg of
         Sort key ->
@@ -265,7 +266,7 @@ sorter sortFn data a b =
     compare ca cb
 
 
-view : Model a -> (Msg -> msg) -> Html msg
+view : Model a msg -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
         indexes =
@@ -324,7 +325,7 @@ view model toMsg =
         ]
 
 
-viewHeaderCells : Model a -> (Msg -> msg) -> List (Html msg)
+viewHeaderCells : Model a msg -> (Msg -> msg) -> List (Html msg)
 viewHeaderCells model toMsg =
     let
         headerCells =
@@ -351,7 +352,7 @@ viewHeaderCells model toMsg =
     Array.toList headerCells ++ [ th [ style "width" "5%" ] [] ]
 
 
-viewFilterCells : Model a -> (Msg -> msg) -> List (Html msg)
+viewFilterCells : Model a msg -> (Msg -> msg) -> List (Html msg)
 viewFilterCells model toMsg =
     let
         filterCells =
@@ -370,7 +371,7 @@ viewFilterCells model toMsg =
     Array.toList filterCells ++ [ th [ style "width" "5%" ] [] ]
 
 
-viewBodyRows : Model a -> List Int -> (Msg -> msg) -> List (Html msg)
+viewBodyRows : Model a msg -> List Int -> (Msg -> msg) -> List (Html msg)
 viewBodyRows model indexes toMsg =
     let
         rows =
