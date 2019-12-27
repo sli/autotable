@@ -5,8 +5,7 @@ work well for simple things.
 
 ## Todo
 
-* Decouple filter/sorting/editing from data.
-* Row-level editing.
+* Row-level editing. The mode can be entered but no signals are sent.
 
 ## Running Demo
 
@@ -25,31 +24,3 @@ document.body.addEventListener('dragstart', e =>
 
 After that, you should just check out `Main.elm` to see how this library is
 actually used in practice.
-
-## Row Editing / Filtering / Sorting Notes
-
-I should probably rewrite the data to use an `Array` instead of a `List`, and
-then rework the filtering / sorting functions to work directly on individual
-rows / pairs of rows, respectively. That way the filtering, sorting, and row
-modes can be controlled using the indexes without ever touching the data
-itself.
-
-The way to implement this seems like generating the indexes, and having generic
-filter/sort functions that map between indexes and elements in the dataset to
-apply the user-specified `sortFn`.
-
-Or, keep the data as a `List` and convert to `Array` when rendering to keep
-`List` ergonomics? Tests will have to be done.
-
-This does present a problem with data updating, though. Maybe an event that can
-set new data? In the demo code, it might work something like:
-
-```elm
-TableMsg AT.UpdateData <| Array.append model.tableState.data someNewData
-```
-
-Or:
-
-```elm
-TableMsg AT.UpdateData <| model.tableState.data ++ someNewData
-```
