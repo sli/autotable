@@ -1,4 +1,4 @@
-![](logo.svg)
+![](logo.png)
 
 An in-development datatable for Elm. The code is not very good, but it should
 work well for simple things.
