@@ -72,7 +72,7 @@ listInsert data index item =
     List.concat
         [ List.take index data
         , [ item ]
-        , List.drop (index + 1) data
+        , List.drop index data
         ]
 
 
@@ -407,7 +407,7 @@ viewDisplayRow column row =
 
 viewEditRow : Column msg a -> a -> Html msg
 viewEditRow column row =
-    td [ class "text-left" ] [ column.editRender row ]
+    td [ class "text-left editing" ] [ column.editRender row ]
 
 
 viewDirection : Direction -> String

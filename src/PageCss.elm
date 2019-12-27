@@ -4,6 +4,7 @@ import Css exposing (..)
 import Css.Global exposing (..)
 import Html.Styled exposing (toUnstyled)
 
+
 pageCss =
     toUnstyled <|
         global
@@ -41,6 +42,9 @@ pageCss =
                 [ borderRadius (px 3)
                 , borderColor <| rgba 0 0 0 0.1
                 ]
+            , selector "table.autotable tbody tr td:not(.editing)"
+                [ padding (rem 0.5)
+                ]
             , input
                 [ borderRadius (px 3)
                 , border3 (px 1) solid <| rgb 0 0 0
@@ -48,11 +52,11 @@ pageCss =
                 , fontSize (pt 12)
                 ]
             , button
-              [ borderRadius (px 3)
-              , border (px 0)
-              , padding (rem 0.5)
-              , color <| rgb 255 255 255
-              , fontSize (pt 12)
-              , backgroundColor <| hex "63B3ED"
-              ]
+                [ borderRadius (px 3)
+                , border (px 0)
+                , padding (rem 0.5)
+                , color <| rgb 255 255 255
+                , fontSize (pt 12)
+                , backgroundColor <| hex "63B3ED"
+                ]
             ]
