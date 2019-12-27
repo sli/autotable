@@ -8,8 +8,6 @@
 	.st2{fill:none;stroke:#BFBFBF;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 	.st3{fill:#BFBFBF;}
 	.st4{fill:none;stroke:#FFFFFF;stroke-width:53;}
-	.st5{font-family:'FiraCode-Bold';}
-	.st6{font-size:468.2864px;}
 </style>
 <rect id="XMLID_25_" x="107.3" y="20" class="st0" width="802.1" height="802.1"/>
 <g id="XMLID_18_">
@@ -20,6 +18,18 @@
 </g>
 <rect id="XMLID_14_" x="107.3" y="20" class="st2" width="802.1" height="802.1"/>
 <rect id="XMLID_23_" x="107.3" y="20" class="st3" width="802.1" height="160.4"/>
-<text id="XMLID_13_" transform="matrix(1 0 0 1 158.1927 767.3109)" class="st4 st5 st6">At</text>
-<text id="XMLID_24_" transform="matrix(1 0 0 1 158.1927 767.3109)" class="st5 st6">At</text>
+<g id="XMLID_7_">
+	<path id="XMLID_8_" class="st4" d="M345.5,697.1h-95.1l-16.9,70.2H153l99.3-324.5h93.2l99.3,324.5h-82.4L345.5,697.1z M262.6,641.8
+		h70.2L297.7,498L262.6,641.8z"/>
+	<path id="XMLID_11_" class="st4" d="M614.3,775.3c-31.8,0-55.8-8.1-71.9-24.4c-16.1-16.2-24.1-39-24.1-68.4V569.7h-52v-51h52v-53.9
+		l74-8.9v62.8h80.1l-7.5,51h-72.6v112.9c0,12.2,2.8,20.9,8.4,26.2c5.6,5.3,14.7,8,27.2,8c15.6,0,30.1-3.7,43.6-11.2l24.4,47.3
+		C672.4,767.8,645.2,775.3,614.3,775.3z"/>
+</g>
+<g id="XMLID_1_">
+	<path id="XMLID_2_" d="M345.5,697.1h-95.1l-16.9,70.2H153l99.3-324.5h93.2l99.3,324.5h-82.4L345.5,697.1z M262.6,641.8h70.2
+		L297.7,498L262.6,641.8z"/>
+	<path id="XMLID_5_" d="M614.3,775.3c-31.8,0-55.8-8.1-71.9-24.4c-16.1-16.2-24.1-39-24.1-68.4V569.7h-52v-51h52v-53.9l74-8.9v62.8
+		h80.1l-7.5,51h-72.6v112.9c0,12.2,2.8,20.9,8.4,26.2c5.6,5.3,14.7,8,27.2,8c15.6,0,30.1-3.7,43.6-11.2l24.4,47.3
+		C672.4,767.8,645.2,775.3,614.3,775.3z"/>
+</g>
 </svg>
