@@ -1,21 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg enable-background="new 0 0 817 817" version="1.1" viewBox="0 0 817 817" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
-<style type="text/css">
-	.st0{fill:none;}
-	.st1{fill:none;stroke:#BFBFBF;stroke-width:15;stroke-miterlimit:10;}
-	.st2{fill:none;stroke:#BFBFBF;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st3{fill:#BFBFBF;}
-	.st4{fill:none;stroke:#FFFFFF;stroke-width:53;}
-</style>
-<rect class="st0" x="7.5" y="7.5" width="802.1" height="802.1"/>
-	<line class="st1" x1="7.5" x2="809.6" y1="167.9" y2="167.9"/>
-	<line class="st1" x1="4.5" x2="809.6" y1="328.3" y2="328.3"/>
-	<line class="st1" x1="7.5" x2="809.6" y1="488.7" y2="488.7"/>
-	<line class="st1" x1="7.5" x2="809.6" y1="649.2" y2="649.2"/>
-<rect class="st2" x="7.5" y="7.5" width="802.1" height="802.1"/>
-<rect class="st3" x="7.5" y="7.5" width="802.1" height="160.4"/>
-	<path class="st4" d="m245.7 684.6h-95.1l-16.9 70.2h-80.5l99.3-324.5h93.2l99.3 324.5h-82.4l-16.9-70.2zm-82.9-55.3h70.2l-35-143.8-35.2 143.8z"/>
-	<path class="st4" d="m514.5 762.8c-31.8 0-55.8-8.1-71.9-24.4-16.1-16.2-24.1-39-24.1-68.4v-112.8h-52v-51h52v-53.9l74-8.9v62.8h80.1l-7.5 51h-72.6v112.9c0 12.2 2.8 20.9 8.4 26.2s14.7 8 27.2 8c15.6 0 30.1-3.7 43.6-11.2l24.4 47.3c-23.5 14.9-50.7 22.4-81.6 22.4z"/>
-	<path d="m245.7 684.6h-95.1l-16.9 70.2h-80.5l99.3-324.5h93.2l99.3 324.5h-82.4l-16.9-70.2zm-82.9-55.3h70.2l-35-143.8-35.2 143.8z"/>
-	<path d="m514.5 762.8c-31.8 0-55.8-8.1-71.9-24.4-16.1-16.2-24.1-39-24.1-68.4v-112.8h-52v-51h52v-53.9l74-8.9v62.8h80.1l-7.5 51h-72.6v112.9c0 12.2 2.8 20.9 8.4 26.2s14.7 8 27.2 8c15.6 0 30.1-3.7 43.6-11.2l24.4 47.3c-23.5 14.9-50.7 22.4-81.6 22.4z"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 525 525.2">
+	<g fill="none" stroke="#bfbfbf" stroke-width="15" stroke-miterlimit="10"><path d="M7.8 109.7h510M5.9 211.7h511.9m-510 102h510m-510 102h510"/><path d="M7.8 7.7h509.9v509.9H7.8z" stroke-linejoin="round"/></g><path d="M7.8 7.7h509.9v102H7.8z" fill="#bfbfbf"/>
+	<g fill="none" stroke="#fff" stroke-width="42"><use xlink:href="#B"/><use xlink:href="#C"/></g><use xlink:href="#B"/><use xlink:href="#C"/>
+	<defs ><path id="B" d="M164.3 440.2h-60.4l-10.7 44.7H41.9L105 278.5h59.2l63.1 206.3H175l-10.7-44.6zm-52.7-35.1h44.7L134 313.7l-22.4 91.4z"/><path id="C" d="M335.2 489.9c-20.2 0-35.5-5.2-45.7-15.5s-15.3-24.8-15.3-43.5v-71.7h-33v-32.5h33v-34.2l47-5.7v39.9h50.9l-4.8 32.5h-46.1V431c0 7.7 1.8 13.3 5.4 16.7s9.3 5.1 17.3 5.1c9.9 0 19.2-2.4 27.7-7.1l15.5 30.1c-15 9.3-32.3 14.1-51.9 14.1z"/></defs>
 </svg>
