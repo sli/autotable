@@ -43,13 +43,17 @@ pageCss =
                 , borderColor <| rgba 0 0 0 0.1
                 ]
             , selector "table.autotable tbody tr td:not(.editing)"
-                [ padding (rem 0.5)
+                [ padding (rem 0.8)
                 ]
             , input
                 [ borderRadius (px 3)
-                , border3 (px 1) solid <| rgb 0 0 0
+                , border3 (px 1) solid <| rgba 0 0 0 0.25
                 , padding (rem 0.25)
                 , fontSize (pt 12)
+                , width (pct 100)
+                , focus
+                    [ boxShadow5 (px 0) (px 0) (px 2) (px 1) <| hex "63B3ED"
+                    ]
                 ]
             , button
                 [ borderRadius (px 3)
