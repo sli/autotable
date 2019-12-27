@@ -277,14 +277,14 @@ view : Model msg a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
         indexes =
-            Array.initialize (Array.length model.data) identity
+            List.range 0 <| Array.length model.data
 
         filteredIndexes =
             List.foldl
                 (\f data ->
                     case findColumn model.columns (first f) of
                         Just c ->
-                            Array.filter
+                            List.filter
                                 (\d ->
                                     case Array.get d model.data of
                                         Just r ->
@@ -315,7 +315,7 @@ view model toMsg =
                         Nothing ->
                             data
                 )
-                (Array.toList filteredIndexes)
+                filteredIndexes
                 model.sorting
     in
     div []
