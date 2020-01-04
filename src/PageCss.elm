@@ -18,7 +18,7 @@ pageCss =
                 , borderCollapse collapse
                 , borderRadius (px 5)
                 , boxShadow5 (px 0) (px 0) (px 20) (px 2) <| rgba 190 190 190 0.25
-                , padding (px 0)
+                , marginTop (rem 2.0)
                 , width (pct 100)
                 ]
             , selector "div.autotable__pagination"
