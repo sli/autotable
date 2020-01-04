@@ -1,11 +1,14 @@
 ![](logo.svg)
 
 An in-development datatable for Elm. The code is not very good, but it should
-work well for simple things.
+work well for simple things. The code is going to be a bit bad for a while but
+the functionality should work as advertised regardless. Strong types are great.
 
 ## Todo
 
-* Row-level editing. The mode can be entered but no signals are sent.
+* Updating the table's data (with `AT.SetData` or something)
+* Pagination
+* Resizable columns
 
 ## Running Demo
 
