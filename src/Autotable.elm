@@ -288,7 +288,7 @@ update msg model =
             { model | page = page }
 
         SetPage page ->
-          { model | page = page }
+            { model | page = page }
 
 
 
@@ -322,7 +322,7 @@ view : Model msg a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
         indexes =
-            List.range 0 <| Array.length model.data
+            List.range 0 <| Array.length model.data - 1
 
         filteredIndexes =
             List.foldl
@@ -440,10 +440,11 @@ viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
 viewBodyRows model indexes toMsg =
     let
         window =
-          if model.pageSize > 0 then
-            List.take model.pageSize <| List.drop (model.pageSize * (model.page - 1)) indexes
-          else
-            indexes
+            if model.pageSize > 0 then
+                List.take model.pageSize <| List.drop (model.pageSize * (model.page - 1)) indexes
+
+            else
+                indexes
 
         rows =
             List.filterMap (\i -> Array.get i model.data) window
@@ -474,18 +475,37 @@ viewEditRow column row index =
     td [ class "text-left editing" ] [ column.editRender row index ]
 
 
+viewPaginationButton : (Msg -> msg) -> Int -> Html msg
+viewPaginationButton toMsg n =
+    let
+        page =
+            n + 1
+    in
+    button
+        [ class "autotable__pagination-page", onClick <| toMsg <| SetPage page ]
+        [ text <| String.fromInt page ]
+
+
 viewPagination : Model msg a -> (Msg -> msg) -> Html msg
 viewPagination model toMsg =
     let
+        length =
+            Array.length model.data
+
         numPages =
             if model.pageSize > 0 then
-                (Array.length model.data // model.pageSize) + 1
+                if modBy model.pageSize length == 0 then
+                    length // model.pageSize
+
+                else
+                    (length // model.pageSize) + 1
 
             else
                 1
 
-        numberEls =
+        pageButtons =
             Array.toList <|
-                Array.initialize numPages (\n -> div [ class "autotable__pagination-page", onClick <| toMsg <| SetPage (n + 1) ] [ text <| String.fromInt (n + 1) ])
+                Array.initialize numPages <|
+                    viewPaginationButton toMsg
     in
-    div [ class "autotable__pagination" ] numberEls
+    div [ class "autotable__pagination" ] pageButtons

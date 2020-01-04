@@ -96,11 +96,11 @@ data =
     , Person "Jimmy" 35 0
     , Person "John" 34 0
     , Person "Ashley" 34 1
-    , Person "Michael" 34 1
-    , Person "Eva" 34 1
-    , Person "Claire" 34 1
-    , Person "Lindsay" 34 1
-    , Person "Natalie" 34 1
+    , Person "Michael" 33 2
+    , Person "Eva" 41 3
+    , Person "Claire" 44 4
+    , Person "Lindsay" 42 2
+    , Person "Natalie" 40 4
     ]
 
 

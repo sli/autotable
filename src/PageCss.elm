@@ -26,12 +26,15 @@ pageCss =
                 , justifyContent flexEnd
                 , paddingTop (rem 0.5)
                 ]
-            , selector "div.autotable__pagination-page"
-                [ border3 (px 1) solid <| rgba 0 0 0 0.25
+            , selector "button.autotable__pagination-page"
+                [ border3 (px 1) solid <| hex "63B3ED"
+                , backgroundColor <| rgba 0 0 0 0
+                , color <| rgb 0 0 0
                 , borderRadius (px 2)
                 , display inline
                 , margin (rem 0.1)
                 , padding2 (rem 0.25) (rem 0.5)
+                , hover [ cursor pointer ]
                 ]
             , thead
                 [ descendants
