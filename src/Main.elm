@@ -128,9 +128,17 @@ update msg model =
         TableMsg tableMsg ->
             ( { model | tableState = AT.update tableMsg model.tableState }, Cmd.none )
 
-        -- A hacky solution but we're still just going for an alpha right now.
+        -- Written with let/in to demonstrate that an HTTP request (or whatever)
+        -- could be sent there to e.g. update the data remotely.
         Edit key index value ->
-            ( { model | tableState = AT.update (AT.Edit key index value) model.tableState }, Cmd.none )
+            let
+                tableState =
+                    AT.update (AT.Edit key index value) model.tableState
+
+                -- Send me to a server!
+                -- newData = Array.toList tableState.data
+            in
+            ( { model | tableState = tableState }, Cmd.none )
 
 
 view : Model -> Html Msg
