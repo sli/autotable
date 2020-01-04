@@ -9,6 +9,7 @@ the functionality should work as advertised regardless. Strong types are great.
 * Updating the table's data (with `AT.SetData` or something)
 * Pagination
 * Resizable columns
+* Documentation, even if usage is a bit awkward
 
 ## Running Demo
 

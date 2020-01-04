@@ -9,7 +9,7 @@ test_build:
       - package.json
   artifacts:
     paths:
-    - dist/
+      - dist/
     expire_in: 1 week
   script:
     - yarn

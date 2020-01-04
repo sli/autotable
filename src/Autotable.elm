@@ -46,6 +46,8 @@ type alias Model msg a =
     , filters : List Filter
     , dragging : Maybe String
     , editing : List Int
+    , pageSize : Int
+    , page : Int
     }
 
 
@@ -58,6 +60,9 @@ type Msg
     | Drop
     | ToggleEdit Int
     | Edit String Int String
+    | NextPage
+    | PrevPage
+    | SetPage Int
 
 
 
@@ -156,14 +161,16 @@ setOrder direction data =
             data
 
 
-init : List (Column msg a) -> List a -> Model msg a
-init columns data =
+init : List (Column msg a) -> List a -> Int -> Model msg a
+init columns data pageSize =
     { dragging = Nothing
     , columns = columns
     , data = Array.fromList data
     , sorting = []
     , filters = []
     , editing = []
+    , pageSize = pageSize
+    , page = 1
     }
 
 
@@ -259,15 +266,29 @@ update msg model =
                     case Array.get index model.data of
                         Just r ->
                             let
-                                row = column.update r value
+                                row =
+                                    column.update r value
                             in
-                                { model | data = Array.set index row model.data }
+                            { model | data = Array.set index row model.data }
 
                         Nothing ->
                             model
 
                 Nothing ->
                     model
+
+        NextPage ->
+            { model | page = model.page + 1 }
+
+        PrevPage ->
+            let
+                page =
+                    max 1 <| model.page - 1
+            in
+            { model | page = page }
+
+        SetPage page ->
+            { model | page = page }
 
 
 
@@ -301,7 +322,7 @@ view : Model msg a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
         indexes =
-            List.range 0 <| Array.length model.data
+            List.range 0 <| Array.length model.data - 1
 
         filteredIndexes =
             List.foldl
@@ -343,8 +364,7 @@ view model toMsg =
                 model.sorting
     in
     div []
-        [ pageCss
-        , table
+        [ table
             [ class "autotable" ]
             [ thead
                 [ class "bg-gray-900 text-white" ]
@@ -353,7 +373,21 @@ view model toMsg =
                 ]
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
+        , viewPagination model toMsg
         ]
+
+
+viewDirection : Direction -> String
+viewDirection direction =
+    case direction of
+        Asc ->
+            "▲"
+
+        Desc ->
+            "▼"
+
+        None ->
+            ""
 
 
 viewHeaderCells : Model msg a -> (Msg -> msg) -> List (Html msg)
@@ -405,8 +439,15 @@ viewFilterCells model toMsg =
 viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
 viewBodyRows model indexes toMsg =
     let
+        window =
+            if model.pageSize > 0 then
+                List.take model.pageSize <| List.drop (model.pageSize * (model.page - 1)) indexes
+
+            else
+                indexes
+
         rows =
-            List.filterMap (\i -> Array.get i model.data) indexes
+            List.filterMap (\i -> Array.get i model.data) window
 
         buildRow index row =
             tr [] <|
@@ -434,14 +475,37 @@ viewEditRow column row index =
     td [ class "text-left editing" ] [ column.editRender row index ]
 
 
-viewDirection : Direction -> String
-viewDirection direction =
-    case direction of
-        Asc ->
-            "▲"
+viewPaginationButton : (Msg -> msg) -> Int -> Html msg
+viewPaginationButton toMsg n =
+    let
+        page =
+            n + 1
+    in
+    button
+        [ class "autotable__pagination-page", onClick <| toMsg <| SetPage page ]
+        [ text <| String.fromInt page ]
 
-        Desc ->
-            "▼"
 
-        None ->
-            ""
+viewPagination : Model msg a -> (Msg -> msg) -> Html msg
+viewPagination model toMsg =
+    let
+        length =
+            Array.length model.data
+
+        numPages =
+            if model.pageSize > 0 then
+                if modBy model.pageSize length == 0 then
+                    length // model.pageSize
+
+                else
+                    (length // model.pageSize) + 1
+
+            else
+                0
+
+        pageButtons =
+            Array.toList <|
+                Array.initialize numPages <|
+                    viewPaginationButton toMsg
+    in
+    div [ class "autotable__pagination" ] pageButtons

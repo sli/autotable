@@ -96,6 +96,11 @@ data =
     , Person "Jimmy" 35 0
     , Person "John" 34 0
     , Person "Ashley" 34 1
+    , Person "Michael" 33 2
+    , Person "Eva" 41 3
+    , Person "Claire" 44 4
+    , Person "Lindsay" 42 2
+    , Person "Natalie" 40 4
     ]
 
 
@@ -111,7 +116,7 @@ type Msg
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { tableState = AT.init columns data }, Cmd.none )
+    ( { tableState = AT.init columns data 0 }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -132,7 +137,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ pageCss
-        , div [] [ AT.view model.tableState TableMsg ]
+        , div [ class "container" ] [ AT.view model.tableState TableMsg ]
         ]
 
 

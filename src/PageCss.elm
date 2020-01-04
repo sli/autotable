@@ -9,13 +9,32 @@ pageCss =
     toUnstyled <|
         global
             [ body [ fontFamily sansSerif ]
+            , selector "div.container"
+                [ margin2 (px 0) auto
+                , width (pct 60)
+                ]
             , selector "table.autotable"
                 [ borderSpacing (px 0)
                 , borderCollapse collapse
                 , borderRadius (px 5)
                 , boxShadow5 (px 0) (px 0) (px 20) (px 2) <| rgba 190 190 190 0.25
-                , margin2 (rem 10.0) auto
-                , padding (px 0)
+                , marginTop (rem 2.0)
+                , width (pct 100)
+                ]
+            , selector "div.autotable__pagination"
+                [ displayFlex
+                , justifyContent flexEnd
+                , paddingTop (rem 0.5)
+                ]
+            , selector "button.autotable__pagination-page"
+                [ border3 (px 1) solid <| hex "63B3ED"
+                , backgroundColor <| rgba 0 0 0 0
+                , color <| rgb 0 0 0
+                , borderRadius (px 2)
+                , display inline
+                , margin (rem 0.1)
+                , padding2 (rem 0.25) (rem 0.5)
+                , hover [ cursor pointer ]
                 ]
             , thead
                 [ descendants
