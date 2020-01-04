@@ -116,7 +116,7 @@ type Msg
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { tableState = AT.init columns data 0 }, Cmd.none )
+    ( { tableState = AT.init columns data 5 }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
