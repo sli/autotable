@@ -62,6 +62,7 @@ type Msg
     | Edit String Int String
     | NextPage
     | PrevPage
+    | SetPage Int
 
 
 
@@ -286,6 +287,9 @@ update msg model =
             in
             { model | page = page }
 
+        SetPage page ->
+          { model | page = page }
+
 
 
 -- SetData data ->
@@ -369,7 +373,7 @@ view model toMsg =
                 ]
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
-        , viewPagination model
+        , viewPagination model toMsg
         ]
 
 
@@ -435,9 +439,14 @@ viewFilterCells model toMsg =
 viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
 viewBodyRows model indexes toMsg =
     let
-        -- TODO: Slice data as per pagination settings here if pagination is enabled, then map to the data.
+        window =
+          if model.pageSize > 0 then
+            List.take model.pageSize <| List.drop (model.pageSize * (model.page - 1)) indexes
+          else
+            indexes
+
         rows =
-            List.filterMap (\i -> Array.get i model.data) indexes
+            List.filterMap (\i -> Array.get i model.data) window
 
         buildRow index row =
             tr [] <|
@@ -465,8 +474,8 @@ viewEditRow column row index =
     td [ class "text-left editing" ] [ column.editRender row index ]
 
 
-viewPagination : Model msg a -> Html msg
-viewPagination model =
+viewPagination : Model msg a -> (Msg -> msg) -> Html msg
+viewPagination model toMsg =
     let
         numPages =
             if model.pageSize > 0 then
@@ -477,6 +486,6 @@ viewPagination model =
 
         numberEls =
             Array.toList <|
-                Array.initialize numPages (\n -> div [ class "autotable__pagination-page" ] [ text <| String.fromInt n ])
+                Array.initialize numPages (\n -> div [ class "autotable__pagination-page", onClick <| toMsg <| SetPage (n + 1) ] [ text <| String.fromInt (n + 1) ])
     in
     div [ class "autotable__pagination" ] numberEls

@@ -100,6 +100,7 @@ data =
     , Person "Eva" 34 1
     , Person "Claire" 34 1
     , Person "Lindsay" 34 1
+    , Person "Natalie" 34 1
     ]
 
 
