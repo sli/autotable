@@ -4,7 +4,7 @@ import Autotable as AT
 import Browser
 import Html exposing (Html, a, div, input, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, type_, value)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
 
@@ -40,34 +40,51 @@ numberFilter fn d s =
     String.startsWith s <| String.fromInt <| fn d
 
 
-myColumns : List (AT.Column Msg Person)
-myColumns =
+columns : List (AT.Column Msg Person)
+columns =
     [ AT.Column
         "Name"
         "name"
         .name
-        (\p -> input [ type_ "text", value p.name ] [])
+        (\p i -> input [ type_ "text", value p.name, onInput <| Edit "name" i ] [])
         .name
         (stringFilter .name)
+        (\r v -> { r | name = v })
     , AT.Column
         "Age"
         "age"
         (\p -> String.fromInt p.age)
-        (\p -> input [ type_ "text", value <| String.fromInt p.age ] [])
+        (\p i -> input [ type_ "text", value <| String.fromInt p.age, onInput <| Edit "age" i ] [])
         (numberSort .age)
         (numberFilter .age)
+        (\r v ->
+            case String.toInt v of
+                Just age ->
+                    { r | age = age }
+
+                Nothing ->
+                    r
+        )
     , AT.Column
         "Cats"
         "cats"
         (\p -> String.fromInt p.cats)
-        (\p -> input [ type_ "text", value <| String.fromInt p.cats ] [])
+        (\p i -> input [ type_ "text", value <| String.fromInt p.cats, onInput <| Edit "cats" i ] [])
         (numberSort .cats)
         (numberFilter .cats)
+        (\r v ->
+            case String.toInt v of
+                Just cats ->
+                    { r | cats = cats }
+
+                Nothing ->
+                    r
+        )
     ]
 
 
-myData : List Person
-myData =
+data : List Person
+data =
     [ Person "Bob" 30 2
     , Person "Jack" 30 1
     , Person "Jane" 31 2
@@ -88,12 +105,13 @@ type alias Model =
 
 type Msg
     = NoOp
+    | Edit String Int String
     | TableMsg AT.Msg
 
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { tableState = AT.init myColumns myData }, Cmd.none )
+    ( { tableState = AT.init columns data }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -104,6 +122,10 @@ update msg model =
 
         TableMsg tableMsg ->
             ( { model | tableState = AT.update tableMsg model.tableState }, Cmd.none )
+
+        -- A hacky solution but we're still just going for an alpha right now.
+        Edit key index value ->
+            ( { model | tableState = AT.update (AT.Edit key index value) model.tableState }, Cmd.none )
 
 
 view : Model -> Html Msg

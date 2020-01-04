@@ -27,9 +27,10 @@ type alias Column msg a =
     { label : String
     , key : String
     , render : a -> String
-    , editRender : a -> Html msg
-    , sortFn : a -> String
-    , filterFn : a -> String -> Bool
+    , editRender : a -> Int -> Html msg
+    , sort : a -> String
+    , filter : a -> String -> Bool
+    , update : a -> String -> a
     }
 
 
@@ -56,6 +57,7 @@ type Msg
     | DragOver String
     | Drop
     | ToggleEdit Int
+    | Edit String Int String
 
 
 
@@ -156,7 +158,13 @@ setOrder direction data =
 
 init : List (Column msg a) -> List a -> Model msg a
 init columns data =
-    { dragging = Nothing, columns = columns, data = Array.fromList data, sorting = [], filters = [], editing = [] }
+    { dragging = Nothing
+    , columns = columns
+    , data = Array.fromList data
+    , sorting = []
+    , filters = []
+    , editing = []
+    }
 
 
 update : Msg -> Model msg a -> Model msg a
@@ -245,6 +253,22 @@ update msg model =
                 Nothing ->
                     { model | editing = index :: model.editing }
 
+        Edit key index value ->
+            case findColumn model.columns key of
+                Just column ->
+                    case Array.get index model.data of
+                        Just r ->
+                            let
+                                row = column.update r value
+                            in
+                                { model | data = Array.set index row model.data }
+
+                        Nothing ->
+                            model
+
+                Nothing ->
+                    model
+
 
 
 -- SetData data ->
@@ -288,7 +312,7 @@ view model toMsg =
                                 (\d ->
                                     case Array.get d model.data of
                                         Just r ->
-                                            c.filterFn r <| second f
+                                            c.filter r <| second f
 
                                         Nothing ->
                                             False
@@ -310,7 +334,7 @@ view model toMsg =
                     in
                     case findColumn model.columns (first s) of
                         Just c ->
-                            setOrder dir <| List.sortWith (sorter c.sortFn model.data) data
+                            setOrder dir <| List.sortWith (sorter c.sort model.data) data
 
                         Nothing ->
                             data
@@ -389,7 +413,7 @@ viewBodyRows model indexes toMsg =
                 List.map
                     (\c ->
                         if listContains index model.editing then
-                            viewEditRow c row
+                            viewEditRow c row index
 
                         else
                             viewDisplayRow c row
@@ -405,9 +429,9 @@ viewDisplayRow column row =
     td [ class "text-left" ] [ text <| column.render row ]
 
 
-viewEditRow : Column msg a -> a -> Html msg
-viewEditRow column row =
-    td [ class "text-left editing" ] [ column.editRender row ]
+viewEditRow : Column msg a -> a -> Int -> Html msg
+viewEditRow column row index =
+    td [ class "text-left editing" ] [ column.editRender row index ]
 
 
 viewDirection : Direction -> String
