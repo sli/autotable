@@ -435,6 +435,7 @@ viewFilterCells model toMsg =
 viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
 viewBodyRows model indexes toMsg =
     let
+        -- TODO: Slice data as per pagination settings here if pagination is enabled, then map to the data.
         rows =
             List.filterMap (\i -> Array.get i model.data) indexes
 
