@@ -501,7 +501,7 @@ viewPagination model toMsg =
                     (length // model.pageSize) + 1
 
             else
-                1
+                0
 
         pageButtons =
             Array.toList <|
