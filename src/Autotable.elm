@@ -46,6 +46,8 @@ type alias Model msg a =
     , filters : List Filter
     , dragging : Maybe String
     , editing : List Int
+    , pageSize : Int
+    , page : Int
     }
 
 
@@ -58,6 +60,8 @@ type Msg
     | Drop
     | ToggleEdit Int
     | Edit String Int String
+    | NextPage
+    | PrevPage
 
 
 
@@ -156,14 +160,16 @@ setOrder direction data =
             data
 
 
-init : List (Column msg a) -> List a -> Model msg a
-init columns data =
+init : List (Column msg a) -> List a -> Int -> Model msg a
+init columns data pageSize =
     { dragging = Nothing
     , columns = columns
     , data = Array.fromList data
     , sorting = []
     , filters = []
     , editing = []
+    , pageSize = pageSize
+    , page = 1
     }
 
 
@@ -259,15 +265,26 @@ update msg model =
                     case Array.get index model.data of
                         Just r ->
                             let
-                                row = column.update r value
+                                row =
+                                    column.update r value
                             in
-                                { model | data = Array.set index row model.data }
+                            { model | data = Array.set index row model.data }
 
                         Nothing ->
                             model
 
                 Nothing ->
                     model
+
+        NextPage ->
+            { model | page = model.page + 1 }
+
+        PrevPage ->
+            let
+                page =
+                    max 1 <| model.page - 1
+            in
+            { model | page = page }
 
 
 
@@ -343,8 +360,7 @@ view model toMsg =
                 model.sorting
     in
     div []
-        [ pageCss
-        , table
+        [ table
             [ class "autotable" ]
             [ thead
                 [ class "bg-gray-900 text-white" ]
@@ -353,7 +369,21 @@ view model toMsg =
                 ]
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
+        , viewPagination model
         ]
+
+
+viewDirection : Direction -> String
+viewDirection direction =
+    case direction of
+        Asc ->
+            "▲"
+
+        Desc ->
+            "▼"
+
+        None ->
+            ""
 
 
 viewHeaderCells : Model msg a -> (Msg -> msg) -> List (Html msg)
@@ -434,14 +464,18 @@ viewEditRow column row index =
     td [ class "text-left editing" ] [ column.editRender row index ]
 
 
-viewDirection : Direction -> String
-viewDirection direction =
-    case direction of
-        Asc ->
-            "▲"
+viewPagination : Model msg a -> Html msg
+viewPagination model =
+    let
+        numPages =
+            if model.pageSize > 0 then
+                (Array.length model.data // model.pageSize) + 1
 
-        Desc ->
-            "▼"
+            else
+                1
 
-        None ->
-            ""
+        numberEls =
+            Array.toList <|
+                Array.initialize numPages (\n -> div [ class "autotable__pagination-page" ] [ text <| String.fromInt n ])
+    in
+    div [ class "autotable__pagination" ] numberEls
