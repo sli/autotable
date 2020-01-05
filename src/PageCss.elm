@@ -36,6 +36,10 @@ pageCss =
                 , padding2 (rem 0.25) (rem 0.5)
                 , hover [ cursor pointer ]
                 ]
+            , selector "button.autotable__pagination-active"
+                [ backgroundColor <| hex "63B3ED"
+                , color <| hex "FFFFFF"
+                ]
             , thead
                 [ descendants
                     [ tr [ color <| rgb 50 50 50, backgroundColor <| rgba 0 0 0 0.035 ]

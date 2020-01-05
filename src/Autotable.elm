@@ -475,14 +475,20 @@ viewEditRow column row index =
     td [ class "text-left editing" ] [ column.editRender row index ]
 
 
-viewPaginationButton : (Msg -> msg) -> Int -> Html msg
-viewPaginationButton toMsg n =
+viewPaginationButton : Int -> (Msg -> msg) -> Int -> Html msg
+viewPaginationButton activePage toMsg n =
     let
         page =
             n + 1
+
+        classes =
+          if page == activePage then
+            "autotable__pagination-page autotable__pagination-active"
+          else
+            "autotable__pagination-page"
     in
     button
-        [ class "autotable__pagination-page", onClick <| toMsg <| SetPage page ]
+        [ class classes, onClick <| toMsg <| SetPage page ]
         [ text <| String.fromInt page ]
 
 
@@ -506,6 +512,6 @@ viewPagination model toMsg =
         pageButtons =
             Array.toList <|
                 Array.initialize numPages <|
-                    viewPaginationButton toMsg
+                    viewPaginationButton model.page toMsg
     in
     div [ class "autotable__pagination" ] pageButtons
