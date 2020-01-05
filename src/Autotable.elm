@@ -373,7 +373,7 @@ view model toMsg =
                 ]
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
-        , viewPagination model toMsg
+        , viewPagination model filteredIndexes toMsg
         ]
 
 
@@ -482,21 +482,22 @@ viewPaginationButton activePage toMsg n =
             n + 1
 
         classes =
-          if page == activePage then
-            "autotable__pagination-page autotable__pagination-active"
-          else
-            "autotable__pagination-page"
+            if page == activePage then
+                "autotable__pagination-page autotable__pagination-active"
+
+            else
+                "autotable__pagination-page"
     in
     button
         [ class classes, onClick <| toMsg <| SetPage page ]
         [ text <| String.fromInt page ]
 
 
-viewPagination : Model msg a -> (Msg -> msg) -> Html msg
-viewPagination model toMsg =
+viewPagination : Model msg a -> List Int -> (Msg -> msg) -> Html msg
+viewPagination model filteredIndexes toMsg =
     let
         length =
-            Array.length model.data
+            List.length filteredIndexes
 
         numPages =
             if model.pageSize > 0 then
