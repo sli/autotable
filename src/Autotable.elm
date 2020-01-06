@@ -2,7 +2,7 @@ module Autotable exposing (..)
 
 import Array exposing (Array)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, placeholder, style, type_, checked)
+import Html.Attributes exposing (checked, class, placeholder, style, type_)
 import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
 import PageCss exposing (pageCss)
@@ -303,9 +303,11 @@ update msg model =
 
         ToggleSelectAll ->
             if Array.length model.data == List.length model.selections then
-              { model | selections = [] }
+                { model | selections = [] }
+
             else
-              { model | selections = List.range 0 <| Array.length model.data - 1 }
+                { model | selections = List.range 0 <| Array.length model.data - 1 }
+
 
 sorter : (a -> String) -> Array a -> Int -> Int -> Order
 sorter sortFn data a b =
@@ -426,7 +428,7 @@ viewHeaderCells model toMsg =
                 model.columns
 
         allSelected =
-          Array.length model.data == List.length model.selections
+            Array.length model.data == List.length model.selections
     in
     List.concat
         [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ] ]
