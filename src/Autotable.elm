@@ -413,7 +413,11 @@ viewHeaderCells model toMsg =
                 )
                 model.columns
     in
-    List.append headerCells [ th [ style "width" "5%" ] [] ]
+    List.concat
+      [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox" ] [] ] ]
+      , headerCells
+      , [ th [ style "width" "5%" ] [] ]
+      ]
 
 
 viewFilterCells : Model msg a -> (Msg -> msg) -> List (Html msg)
@@ -432,7 +436,11 @@ viewFilterCells model toMsg =
                 )
                 model.columns
     in
-    List.append filterCells [ th [ style "width" "5%" ] [] ]
+    List.concat
+      [ [ th [ style "width" "5%" ] [] ]
+      , filterCells
+      , [ th [ style "width" "5%" ] [] ]
+      ]
 
 
 viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
@@ -458,15 +466,16 @@ viewBodyRows model indexes toMsg =
                         StartEdit
             in
             tr [] <|
-                List.map
-                    (\c ->
-                        if listContains index model.editing then
-                            viewEditRow c row index
+                [ td [] [ input [ type_ "checkbox" ] [] ] ]
+                    ++ List.map
+                        (\c ->
+                            if listContains index model.editing then
+                                viewEditRow c row index
 
-                        else
-                            viewDisplayRow c row
-                    )
-                    model.columns
+                            else
+                                viewDisplayRow c row
+                        )
+                        model.columns
                     ++ [ td [] [ button [ onClick <| toMsg <| signal index ] [ text "Edit" ] ] ]
     in
     List.indexedMap buildRow rows
