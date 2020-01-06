@@ -8,6 +8,7 @@ the functionality should work as advertised regardless. Strong types are great.
 
 * Updating the table's data (with `AT.SetData` or something)
 * Resizable columns
+* Row selection
 * Documentation, even if usage is a bit awkward
 
 ## Running Demo
