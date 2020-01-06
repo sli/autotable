@@ -13,6 +13,7 @@ the functionality should work as advertised regardless. Strong types are great.
 * Pagination
 * Row-level editing
 * Drag and drop reorderable columns
+* Row-level selection
 
 ## Half-Features
 
