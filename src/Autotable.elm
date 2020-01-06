@@ -58,7 +58,8 @@ type Msg
     | DragEnd
     | DragOver String
     | Drop
-    | ToggleEdit Int
+    | StartEdit Int
+    | FinishEdit Int
     | Edit String Int String
     | NextPage
     | PrevPage
@@ -252,13 +253,11 @@ update msg model =
         Drop ->
             { model | dragging = Nothing }
 
-        ToggleEdit index ->
-            case List.head <| List.filter (\i -> i == index) model.editing of
-                Just found ->
-                    { model | editing = List.filter (\i -> i /= index) model.editing }
+        StartEdit index ->
+            { model | editing = index :: model.editing }
 
-                Nothing ->
-                    { model | editing = index :: model.editing }
+        FinishEdit index ->
+            { model | editing = List.filter (\i -> i /= index) model.editing }
 
         Edit key index value ->
             case findColumn model.columns key of
@@ -450,6 +449,14 @@ viewBodyRows model indexes toMsg =
             List.filterMap (\i -> Array.get i model.data) window
 
         buildRow index row =
+            let
+                signal =
+                    if listContains index model.editing then
+                        FinishEdit
+
+                    else
+                        StartEdit
+            in
             tr [] <|
                 List.map
                     (\c ->
@@ -460,7 +467,7 @@ viewBodyRows model indexes toMsg =
                             viewDisplayRow c row
                     )
                     model.columns
-                    ++ [ td [] [ button [ onClick <| toMsg <| ToggleEdit index ] [ text "Edit" ] ] ]
+                    ++ [ td [] [ button [ onClick <| toMsg <| signal index ] [ text "Edit" ] ] ]
     in
     List.indexedMap buildRow rows
 
