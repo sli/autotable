@@ -2,7 +2,7 @@ module Autotable exposing (..)
 
 import Array exposing (Array)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, placeholder, style, type_)
+import Html.Attributes exposing (class, placeholder, style, type_, checked)
 import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
 import PageCss exposing (pageCss)
@@ -469,7 +469,7 @@ viewBodyRows model indexes toMsg =
 
         buildRow index row =
             let
-                signal =
+                editSignal =
                     if listContains index model.editing then
                         FinishEdit
 
@@ -478,7 +478,7 @@ viewBodyRows model indexes toMsg =
             in
             tr [] <|
                 List.concat
-                    [ [ td [] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelection index ] [] ] ]
+                    [ [ td [] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelection index, checked <| listContains index model.selections ] [] ] ]
                     , List.map
                         (\c ->
                             if listContains index model.editing then
@@ -488,10 +488,10 @@ viewBodyRows model indexes toMsg =
                                 viewDisplayRow c row
                         )
                         model.columns
-                    , [ td [] [ button [ onClick <| toMsg <| signal index ] [ text "Edit" ] ] ]
+                    , [ td [] [ button [ onClick <| toMsg <| editSignal index ] [ text "Edit" ] ] ]
                     ]
     in
-    List.indexedMap buildRow rows
+    List.map2 buildRow window rows
 
 
 viewDisplayRow : Column msg a -> a -> Html msg
