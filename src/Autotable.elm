@@ -3,7 +3,7 @@ module Autotable exposing (..)
 import Array exposing (Array)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, placeholder, style, type_)
-import Html.Events exposing (on, onClick, onInput)
+import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
 import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
@@ -48,6 +48,7 @@ type alias Model msg a =
     , editing : List Int
     , pageSize : Int
     , page : Int
+    , selections : List Int
     }
 
 
@@ -64,10 +65,7 @@ type Msg
     | NextPage
     | PrevPage
     | SetPage Int
-
-
-
--- | SetData (List a)
+    | ToggleSelection Int
 
 
 zip : List a -> List b -> List ( a, b )
@@ -112,6 +110,11 @@ onDragOver msg =
 onDrop : msg -> Attribute msg
 onDrop msg =
     on "drop" <| D.succeed msg
+
+
+onToggleCheck : msg -> Attribute msg
+onToggleCheck msg =
+    on "input" <| D.succeed msg
 
 
 stepDirection : Direction -> Direction
@@ -172,6 +175,7 @@ init columns data pageSize =
     , editing = []
     , pageSize = pageSize
     , page = 1
+    , selections = []
     }
 
 
@@ -288,6 +292,13 @@ update msg model =
 
         SetPage page ->
             { model | page = page }
+
+        ToggleSelection index ->
+            if listContains index model.selections then
+                { model | selections = List.filter (\i -> i /= index) model.selections }
+
+            else
+                { model | selections = index :: model.selections }
 
 
 
@@ -414,10 +425,10 @@ viewHeaderCells model toMsg =
                 model.columns
     in
     List.concat
-      [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox" ] [] ] ]
-      , headerCells
-      , [ th [ style "width" "5%" ] [] ]
-      ]
+        [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox" ] [] ] ]
+        , headerCells
+        , [ th [ style "width" "5%" ] [] ]
+        ]
 
 
 viewFilterCells : Model msg a -> (Msg -> msg) -> List (Html msg)
@@ -437,10 +448,10 @@ viewFilterCells model toMsg =
                 model.columns
     in
     List.concat
-      [ [ th [ style "width" "5%" ] [] ]
-      , filterCells
-      , [ th [ style "width" "5%" ] [] ]
-      ]
+        [ [ th [ style "width" "5%" ] [] ]
+        , filterCells
+        , [ th [ style "width" "5%" ] [] ]
+        ]
 
 
 viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
@@ -466,8 +477,9 @@ viewBodyRows model indexes toMsg =
                         StartEdit
             in
             tr [] <|
-                [ td [] [ input [ type_ "checkbox" ] [] ] ]
-                    ++ List.map
+                List.concat
+                    [ [ td [] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelection index ] [] ] ]
+                    , List.map
                         (\c ->
                             if listContains index model.editing then
                                 viewEditRow c row index
@@ -476,7 +488,8 @@ viewBodyRows model indexes toMsg =
                                 viewDisplayRow c row
                         )
                         model.columns
-                    ++ [ td [] [ button [ onClick <| toMsg <| signal index ] [ text "Edit" ] ] ]
+                    , [ td [] [ button [ onClick <| toMsg <| signal index ] [ text "Edit" ] ] ]
+                    ]
     in
     List.indexedMap buildRow rows
 
