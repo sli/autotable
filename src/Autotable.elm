@@ -66,6 +66,7 @@ type Msg
     | PrevPage
     | SetPage Int
     | ToggleSelection Int
+    | ToggleSelectAll
 
 
 zip : List a -> List b -> List ( a, b )
@@ -300,11 +301,11 @@ update msg model =
             else
                 { model | selections = index :: model.selections }
 
-
-
--- SetData data ->
---     { model | data = Array.fromList data }
-
+        ToggleSelectAll ->
+            if Array.length model.data == List.length model.selections then
+              { model | selections = [] }
+            else
+              { model | selections = List.range 0 <| Array.length model.data - 1 }
 
 sorter : (a -> String) -> Array a -> Int -> Int -> Order
 sorter sortFn data a b =
@@ -423,9 +424,12 @@ viewHeaderCells model toMsg =
                         ]
                 )
                 model.columns
+
+        allSelected =
+          Array.length model.data == List.length model.selections
     in
     List.concat
-        [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox" ] [] ] ]
+        [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ] ]
         , headerCells
         , [ th [ style "width" "5%" ] [] ]
         ]
