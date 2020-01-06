@@ -23,8 +23,8 @@ programmer using the table, additional features can be supplied to the table
 without the table itself supporting them. Some examples:
 
 * Updating the table data (it's in the table state)
-* Remote sorting/filtering/pagination/etc., just return a `Cmd Msg` that can then
-  dispatch a signal that will update the table
+* Remote sorting/filtering/pagination/etc., just return a `Cmd Msg` that can
+  then dispatch a signal that will update the table
 
 ## Todo
 
