@@ -29,10 +29,11 @@ without the table itself supporting them. Some examples:
 
 ## Styling
 
-I use [elm-css](https://package.elm-lang.org/packages/rtfeldman/elm-css/latest/).
+The table itself does no styling beyond two column widths. To style the demo, I
+use [elm-css](https://package.elm-lang.org/packages/rtfeldman/elm-css/latest/).
 The table itself has the class `autotable`, so that can be used to style
 anything within the table. Learn your CSS selectors if you haven't already.
-There are also two more class names in use:
+There are also a few more class names in use that can (and should) be styled:
 
 * `span.autotable__sort-indicator` - The up/down arrow that displays the
   sorting direction for a column.
