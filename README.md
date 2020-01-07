@@ -42,8 +42,14 @@ There are also a few more class names in use that can (and should) be styled:
 * `button.autotable__pagination-active` - The pagination button for the current
   page.
 * `autotable__column-{key}` - Header cell for the column with the given `key`.
+  Most likely to be used to set the column's width.
 * `autotable__column-filter-{key}` - Filter input cell for the column with the
-  given `key`.
+  given `key`. Should probably be set to the same width as the class above, if
+  set.
+* `autotable__header-checkbox` - Both checkbox header cells. Most likely used
+  to set the column's width.
+* `autotable__header-actions` - Both action header cells (e.g. edit button).
+  Most likely used to set the column's width.
 
 ## Todo
 

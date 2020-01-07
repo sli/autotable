@@ -426,9 +426,12 @@ viewHeaderCells model toMsg =
             Array.length model.data == List.length model.selections
     in
     List.concat
-        [ [ th [ style "width" "1%" ] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ] ]
+        [ [ th
+                [ style "width" "1%", class "autotable__header-checkbox" ]
+                [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ]
+          ]
         , headerCells
-        , [ th [ style "width" "5%" ] [] ]
+        , [ th [ style "width" "5%", class "autotable__header-actions" ] [] ]
         ]
 
 
@@ -449,9 +452,9 @@ viewFilterCells model toMsg =
                 model.columns
     in
     List.concat
-        [ [ th [ style "width" "1%" ] [] ]
+        [ [ th [ style "width" "1%", class "autotable__header-checkbox" ] [] ]
         , filterCells
-        , [ th [ style "width" "5%" ] [] ]
+        , [ th [ style "width" "5%", class "autotable__header-actions" ] [] ]
         ]
 
 
