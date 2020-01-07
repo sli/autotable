@@ -2,10 +2,10 @@ module Main exposing (..)
 
 import Autotable as AT
 import Browser
+import DemoCss exposing (pageCss, tableOldDefaultCss, tableMaterialCss, tableDefaultCss)
 import Html exposing (Html, a, div, input, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick, onInput)
-import DemoCss exposing (pageCss, tableDefaultCss)
 import Tuple exposing (first, second)
 
 
