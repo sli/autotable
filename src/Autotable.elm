@@ -2,8 +2,8 @@ module Autotable exposing (..)
 
 import Array exposing (Array)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, placeholder, style, type_)
-import Html.Events exposing (on, onClick, onInput)
+import Html.Attributes exposing (checked, class, placeholder, style, type_)
+import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
 import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
@@ -48,6 +48,7 @@ type alias Model msg a =
     , editing : List Int
     , pageSize : Int
     , page : Int
+    , selections : List Int
     }
 
 
@@ -64,10 +65,8 @@ type Msg
     | NextPage
     | PrevPage
     | SetPage Int
-
-
-
--- | SetData (List a)
+    | ToggleSelection Int
+    | ToggleSelectAll
 
 
 zip : List a -> List b -> List ( a, b )
@@ -112,6 +111,11 @@ onDragOver msg =
 onDrop : msg -> Attribute msg
 onDrop msg =
     on "drop" <| D.succeed msg
+
+
+onToggleCheck : msg -> Attribute msg
+onToggleCheck msg =
+    on "input" <| D.succeed msg
 
 
 stepDirection : Direction -> Direction
@@ -172,6 +176,7 @@ init columns data pageSize =
     , editing = []
     , pageSize = pageSize
     , page = 1
+    , selections = []
     }
 
 
@@ -289,10 +294,19 @@ update msg model =
         SetPage page ->
             { model | page = page }
 
+        ToggleSelection index ->
+            if listContains index model.selections then
+                { model | selections = List.filter (\i -> i /= index) model.selections }
 
+            else
+                { model | selections = index :: model.selections }
 
--- SetData data ->
---     { model | data = Array.fromList data }
+        ToggleSelectAll ->
+            if Array.length model.data == List.length model.selections then
+                { model | selections = [] }
+
+            else
+                { model | selections = List.range 0 <| Array.length model.data - 1 }
 
 
 sorter : (a -> String) -> Array a -> Int -> Int -> Order
@@ -412,8 +426,15 @@ viewHeaderCells model toMsg =
                         ]
                 )
                 model.columns
+
+        allSelected =
+            Array.length model.data == List.length model.selections
     in
-    List.append headerCells [ th [ style "width" "5%" ] [] ]
+    List.concat
+        [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ] ]
+        , headerCells
+        , [ th [ style "width" "5%" ] [] ]
+        ]
 
 
 viewFilterCells : Model msg a -> (Msg -> msg) -> List (Html msg)
@@ -432,7 +453,11 @@ viewFilterCells model toMsg =
                 )
                 model.columns
     in
-    List.append filterCells [ th [ style "width" "5%" ] [] ]
+    List.concat
+        [ [ th [ style "width" "5%" ] [] ]
+        , filterCells
+        , [ th [ style "width" "5%" ] [] ]
+        ]
 
 
 viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
@@ -450,7 +475,7 @@ viewBodyRows model indexes toMsg =
 
         buildRow index row =
             let
-                signal =
+                editSignal =
                     if listContains index model.editing then
                         FinishEdit
 
@@ -458,18 +483,21 @@ viewBodyRows model indexes toMsg =
                         StartEdit
             in
             tr [] <|
-                List.map
-                    (\c ->
-                        if listContains index model.editing then
-                            viewEditRow c row index
+                List.concat
+                    [ [ td [] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelection index, checked <| listContains index model.selections ] [] ] ]
+                    , List.map
+                        (\c ->
+                            if listContains index model.editing then
+                                viewEditRow c row index
 
-                        else
-                            viewDisplayRow c row
-                    )
-                    model.columns
-                    ++ [ td [] [ button [ onClick <| toMsg <| signal index ] [ text "Edit" ] ] ]
+                            else
+                                viewDisplayRow c row
+                        )
+                        model.columns
+                    , [ td [] [ button [ onClick <| toMsg <| editSignal index ] [ text "Edit" ] ] ]
+                    ]
     in
-    List.indexedMap buildRow rows
+    List.map2 buildRow window rows
 
 
 viewDisplayRow : Column msg a -> a -> Html msg
