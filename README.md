@@ -41,6 +41,9 @@ There are also a few more class names in use that can (and should) be styled:
 * `button.autotable__pagination-page` - The pagination buttons themselves.
 * `button.autotable__pagination-active` - The pagination button for the current
   page.
+* `autotable__column-{key}` - Header cell for the column with the given `key`.
+* `autotable__column-filter-{key}` - Filter input cell for the column with the
+  given `key`.
 
 ## Todo
 

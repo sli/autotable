@@ -249,6 +249,7 @@ update msg model =
 
                 _ ->
                     model
+
         Drop ->
             { model | dragging = Nothing }
 
@@ -413,6 +414,7 @@ viewHeaderCells model toMsg =
                         , onDragOver <| toMsg <| DragOver c.key
                         , Html.Attributes.draggable "true"
                         , style "user-select" "none"
+                        , class <| "autotable__column-" ++ c.key
                         ]
                         [ text <| c.label
                         , span [ class "autotable__sort-indicator" ] [ text sorting ]
@@ -440,9 +442,9 @@ viewFilterCells model toMsg =
                         inputHandler s =
                             toMsg <| Filter c.key s
                     in
-                    th []
-                        [ input [ type_ "text", placeholder "Filter", onInput inputHandler ] []
-                        ]
+                    th
+                        [ class <| "autotable__column-filter-" ++ c.key ]
+                        [ input [ type_ "text", placeholder "Filter", onInput inputHandler ] [] ]
                 )
                 model.columns
     in
