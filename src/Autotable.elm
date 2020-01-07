@@ -379,8 +379,7 @@ view model toMsg =
     div []
         [ table
             [ class "autotable" ]
-            [ thead
-                [ class "bg-gray-900 text-white" ]
+            [ thead []
                 [ tr [] <| viewHeaderCells model toMsg
                 , tr [ class "filter-inputs" ] <| viewFilterCells model toMsg
                 ]
@@ -422,7 +421,7 @@ viewHeaderCells model toMsg =
                         , style "user-select" "none"
                         ]
                         [ text <| c.label
-                        , span [ class "sort-indicator" ] [ text sorting ]
+                        , span [ class "autotable__sort-indicator" ] [ text sorting ]
                         ]
                 )
                 model.columns
@@ -431,7 +430,7 @@ viewHeaderCells model toMsg =
             Array.length model.data == List.length model.selections
     in
     List.concat
-        [ [ th [ style "width" "5%" ] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ] ]
+        [ [ th [ style "width" "1%" ] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ] ]
         , headerCells
         , [ th [ style "width" "5%" ] [] ]
         ]
@@ -454,7 +453,7 @@ viewFilterCells model toMsg =
                 model.columns
     in
     List.concat
-        [ [ th [ style "width" "5%" ] [] ]
+        [ [ th [ style "width" "1%" ] [] ]
         , filterCells
         , [ th [ style "width" "5%" ] [] ]
         ]

@@ -57,7 +57,7 @@ pageCss =
                 ]
             , th [ width (pct 15), padding (rem 0.5), textAlign left ]
             , td [ padding (rem 0.5) ]
-            , selector ".sort-indicator"
+            , selector "span.autotable__sort-indicator"
                 [ marginLeft (px 10)
                 , fontSize (pt 10)
                 ]
