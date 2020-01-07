@@ -225,36 +225,30 @@ update msg model =
             { model | dragging = Nothing }
 
         DragOver target ->
-            -- TODO: I hate it, but it works for now. Find a better way.
-            -- Read the Basic.Maybe docs, ya ding dong.
-            case indexForColumn target model.columns of
-                Just targetPosition ->
-                    case model.dragging of
-                        Just key ->
-                            if key /= target then
-                                case List.head <| List.filter (\c -> c.key == key) model.columns of
-                                    Just column ->
-                                        let
-                                            cleaned =
-                                                List.filter (\c -> c.key /= key) model.columns
+            -- TODO: This is better than what was here before but still not
+            -- great, in my option. Surely there's a cleaner way.
+            case ( indexForColumn target model.columns, model.dragging ) of
+                ( Just targetPosition, Just key ) ->
+                    if key /= target then
+                        case List.head <| List.filter (\c -> c.key == key) model.columns of
+                            Just column ->
+                                let
+                                    cleaned =
+                                        List.filter (\c -> c.key /= key) model.columns
 
-                                            columns =
-                                                listInsert cleaned targetPosition column
-                                        in
-                                        { model | columns = columns }
+                                    columns =
+                                        listInsert cleaned targetPosition column
+                                in
+                                { model | columns = columns }
 
-                                    Nothing ->
-                                        model
-
-                            else
+                            Nothing ->
                                 model
 
-                        Nothing ->
-                            model
+                    else
+                        model
 
-                Nothing ->
+                _ ->
                     model
-
         Drop ->
             { model | dragging = Nothing }
 
