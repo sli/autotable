@@ -5,7 +5,6 @@ import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody
 import Html.Attributes exposing (checked, class, placeholder, style, type_)
 import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
-import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
 
 
