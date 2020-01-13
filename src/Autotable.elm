@@ -375,7 +375,7 @@ view model toMsg =
             [ class "autotable" ]
             [ thead []
                 [ tr [] <| viewHeaderCells model toMsg
-                , tr [ class "filter-inputs" ] <| viewFilterCells model toMsg
+                , tr [] <| viewFilterCells model toMsg
                 ]
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
@@ -413,7 +413,7 @@ viewHeaderCells model toMsg =
                         , onDragOver <| toMsg <| DragOver c.key
                         , Html.Attributes.draggable "true"
                         , style "user-select" "none"
-                        , class <| "autotable__column-" ++ c.key
+                        , class <| "autotable__column autotable__column-" ++ c.key
                         ]
                         [ text <| c.label
                         , span [ class "autotable__sort-indicator" ] [ text sorting ]
@@ -426,11 +426,11 @@ viewHeaderCells model toMsg =
     in
     List.concat
         [ [ th
-                [ style "width" "1%", class "autotable__header-checkbox" ]
+                [ style "width" "1%", class "autotable__checkbox-header" ]
                 [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ]
           ]
         , headerCells
-        , [ th [ style "width" "5%", class "autotable__header-actions" ] [] ]
+        , [ th [ style "width" "5%", class "autotable__actions-header" ] [] ]
         ]
 
 
@@ -445,7 +445,7 @@ viewFilterCells model toMsg =
                             toMsg <| Filter c.key s
                     in
                     th
-                        [ class <| "autotable__column-filter-" ++ c.key ]
+                        [ class <| "autotable__column-filter autotable__column-filter-" ++ c.key ]
                         [ input [ type_ "text", placeholder "Filter", onInput inputHandler ] [] ]
                 )
                 model.columns
@@ -481,7 +481,16 @@ viewBodyRows model indexes toMsg =
             in
             tr [] <|
                 List.concat
-                    [ [ td [] [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelection index, checked <| listContains index model.selections ] [] ] ]
+                    [ [ td
+                            [ class "autotable__checkbox" ]
+                            [ input
+                                [ type_ "checkbox"
+                                , onToggleCheck <| toMsg <| ToggleSelection index
+                                , checked <| listContains index model.selections
+                                ]
+                                []
+                            ]
+                      ]
                     , List.map
                         (\c ->
                             if listContains index model.editing then
@@ -491,7 +500,10 @@ viewBodyRows model indexes toMsg =
                                 viewDisplayRow c row
                         )
                         model.columns
-                    , [ td [] [ button [ onClick <| toMsg <| editSignal index ] [ text "Edit" ] ] ]
+                    , [ td
+                            [ class "autotable__actions" ]
+                            [ button [ onClick <| toMsg <| editSignal index ] [ text "Edit" ] ]
+                      ]
                     ]
     in
     List.map2 buildRow window rows

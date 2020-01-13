@@ -2,10 +2,10 @@ module Main exposing (..)
 
 import Autotable as AT
 import Browser
+import DemoCss exposing (pageCss, tableOldDefaultCss, tableDefaultCss)
 import Html exposing (Html, a, div, input, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick, onInput)
-import PageCss exposing (pageCss)
 import Tuple exposing (first, second)
 
 
@@ -136,6 +136,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ pageCss
+        , tableOldDefaultCss
         , div [ class "container" ] [ AT.view model.tableState TableMsg ]
         ]
 
