@@ -72,5 +72,30 @@ document.body.addEventListener('dragstart', e =>
   e.dataTransfer.setData('text/plain', null))
 ```
 
-After that, you should just check out `Main.elm` to see how this library is
-actually used in practice.
+Here's a minimal example:
+
+```elm
+import Autotable as AT
+
+type Model =
+  { tableState : AT.Model }
+
+type Msg
+  = TableMsg AT.Msg
+
+{-| Ideally `data` and `columns` are defined somewhere.
+-}
+init : () -> ( Model, Cmd Msg )
+init _ =
+  { tableState = AT.init columns data 5 }
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  case msg of
+    TableMsg tableMsg ->
+      ( { model | tableState = AT.update tableMsg})
+
+view : Model -> Html Msg
+view model =
+  div [] [ AT.view model.tableState TableMsg ]
+```
