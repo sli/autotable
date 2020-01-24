@@ -2,9 +2,10 @@ module Autotable exposing (..)
 
 import Array exposing (Array)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (checked, class, placeholder, style, type_)
+import Html.Attributes exposing (checked, class, draggable, placeholder, style, type_)
 import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
+import Options exposing (..)
 import Tuple exposing (first, second)
 
 
@@ -33,11 +34,6 @@ type alias Column msg a =
     }
 
 
-type RowMode
-    = Viewing
-    | Editing
-
-
 type alias Model msg a =
     { columns : List (Column msg a)
     , data : Array a
@@ -45,9 +41,9 @@ type alias Model msg a =
     , filters : List Filter
     , dragging : Maybe String
     , editing : List Int
-    , pageSize : Int
-    , page : Int
     , selections : List Int
+    , page : Int
+    , options : Options
     }
 
 
@@ -165,17 +161,17 @@ setOrder direction data =
             data
 
 
-init : List (Column msg a) -> List a -> Int -> Model msg a
-init columns data pageSize =
+init : List (Column msg a) -> List a -> Options -> Model msg a
+init columns data options =
     { dragging = Nothing
     , columns = columns
     , data = Array.fromList data
     , sorting = []
     , filters = []
     , editing = []
-    , pageSize = pageSize
-    , page = 1
     , selections = []
+    , page = 1
+    , options = options
     }
 
 
@@ -369,14 +365,22 @@ view model toMsg =
                 )
                 filteredIndexes
                 model.sorting
+
+        headerRows =
+            case filtering model.options of
+                Filtering ->
+                    [ tr [] <| viewHeaderCells model toMsg
+                    , tr [] <| viewFilterCells model toMsg
+                    ]
+
+                NoFiltering ->
+                    [ tr [] <| viewHeaderCells model toMsg ]
     in
     div []
         [ table
             [ class "autotable" ]
             [ thead []
-                [ tr [] <| viewHeaderCells model toMsg
-                , tr [] <| viewFilterCells model toMsg
-                ]
+                headerRows
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
         , viewPagination model filteredIndexes toMsg
@@ -396,9 +400,36 @@ viewDirection direction =
             ""
 
 
+headerCellAttrs : Model msg a -> (Msg -> msg) -> Column msg a -> List (Html.Attribute msg)
+headerCellAttrs model toMsg c =
+    List.concat
+        [ case sorting model.options of
+            Sorting ->
+                [ onClick <| toMsg <| Sort c.key ]
+
+            NoSorting ->
+                []
+        , case dragging model.options of
+            Dragging ->
+                [ onDragStart <| toMsg <| DragStart c.key
+                , onDragEnd <| toMsg DragEnd
+                , onDragOver <| toMsg <| DragOver c.key
+                , draggable "true"
+                , style "user-select" "none"
+                ]
+
+            NoDragging ->
+                []
+        , [ class <| "autotable__column autotable__column-" ++ c.key ]
+        ]
+
+
 viewHeaderCells : Model msg a -> (Msg -> msg) -> List (Html msg)
 viewHeaderCells model toMsg =
     let
+        makeAttrs =
+            headerCellAttrs model toMsg
+
         headerCells =
             List.map
                 (\c ->
@@ -407,14 +438,7 @@ viewHeaderCells model toMsg =
                             findSorting model.sorting c.key |> viewDirection
                     in
                     th
-                        [ onClick <| toMsg <| Sort c.key
-                        , onDragStart <| toMsg <| DragStart c.key
-                        , onDragEnd <| toMsg DragEnd
-                        , onDragOver <| toMsg <| DragOver c.key
-                        , Html.Attributes.draggable "true"
-                        , style "user-select" "none"
-                        , class <| "autotable__column autotable__column-" ++ c.key
-                        ]
+                        (makeAttrs c)
                         [ text <| c.label
                         , span [ class "autotable__sort-indicator" ] [ text sorting ]
                         ]
@@ -425,12 +449,22 @@ viewHeaderCells model toMsg =
             Array.length model.data == List.length model.selections
     in
     List.concat
-        [ [ th
-                [ style "width" "1%", class "autotable__checkbox-header" ]
-                [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ]
-          ]
+        [ case selecting model.options of
+            Selecting ->
+                [ th
+                    [ style "width" "1%", class "autotable__checkbox-header" ]
+                    [ input [ type_ "checkbox", onToggleCheck <| toMsg <| ToggleSelectAll, checked allSelected ] [] ]
+                ]
+
+            NoSelecting ->
+                []
         , headerCells
-        , [ th [ style "width" "5%", class "autotable__actions-header" ] [] ]
+        , case editing model.options of
+            Editing ->
+                [ th [ style "width" "5%", class "autotable__actions-header" ] [] ]
+
+            NoEditing ->
+                []
         ]
 
 
@@ -451,9 +485,19 @@ viewFilterCells model toMsg =
                 model.columns
     in
     List.concat
-        [ [ th [ style "width" "1%", class "autotable__header-checkbox" ] [] ]
+        [ case selecting model.options of
+            Selecting ->
+                [ th [ style "width" "1%", class "autotable__header-checkbox" ] [] ]
+
+            NoSelecting ->
+                []
         , filterCells
-        , [ th [ style "width" "5%", class "autotable__header-actions" ] [] ]
+        , case editing model.options of
+            Editing ->
+                [ th [ style "width" "5%", class "autotable__header-actions" ] [] ]
+
+            NoEditing ->
+                []
         ]
 
 
@@ -461,11 +505,12 @@ viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
 viewBodyRows model indexes toMsg =
     let
         window =
-            if model.pageSize > 0 then
-                List.take model.pageSize <| List.drop (model.pageSize * (model.page - 1)) indexes
+            case Options.pagination model.options of
+                Pagination pageSize ->
+                    List.take pageSize <| List.drop (pageSize * (model.page - 1)) indexes
 
-            else
-                indexes
+                NoPagination ->
+                    indexes
 
         rows =
             List.filterMap (\i -> Array.get i model.data) window
@@ -481,16 +526,21 @@ viewBodyRows model indexes toMsg =
             in
             tr [] <|
                 List.concat
-                    [ [ td
-                            [ class "autotable__checkbox" ]
-                            [ input
-                                [ type_ "checkbox"
-                                , onToggleCheck <| toMsg <| ToggleSelection index
-                                , checked <| listContains index model.selections
+                    [ case selecting model.options of
+                        Selecting ->
+                            [ td
+                                [ class "autotable__checkbox" ]
+                                [ input
+                                    [ type_ "checkbox"
+                                    , onToggleCheck <| toMsg <| ToggleSelection index
+                                    , checked <| listContains index model.selections
+                                    ]
+                                    []
                                 ]
-                                []
                             ]
-                      ]
+
+                        NoSelecting ->
+                            []
                     , List.map
                         (\c ->
                             if listContains index model.editing then
@@ -500,10 +550,15 @@ viewBodyRows model indexes toMsg =
                                 viewDisplayRow c row
                         )
                         model.columns
-                    , [ td
-                            [ class "autotable__actions" ]
-                            [ button [ onClick <| toMsg <| editSignal index ] [ text "Edit" ] ]
-                      ]
+                    , case editing model.options of
+                        Editing ->
+                            [ td
+                                [ class "autotable__actions" ]
+                                [ button [ onClick <| toMsg <| editSignal index ] [ text "Edit" ] ]
+                            ]
+
+                        NoEditing ->
+                            []
                     ]
     in
     List.map2 buildRow window rows
@@ -544,15 +599,16 @@ viewPagination model filteredIndexes toMsg =
             List.length filteredIndexes
 
         numPages =
-            if model.pageSize > 0 then
-                if modBy model.pageSize length == 0 then
-                    length // model.pageSize
+            case pagination model.options of
+                Pagination pageSize ->
+                    if modBy pageSize length == 0 then
+                        length // pageSize
 
-                else
-                    (length // model.pageSize) + 1
+                    else
+                        (length // pageSize) + 1
 
-            else
-                0
+                NoPagination ->
+                    0
 
         pageButtons =
             Array.toList <|

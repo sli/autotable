@@ -2,10 +2,11 @@ module Main exposing (..)
 
 import Autotable as AT
 import Browser
-import DemoCss exposing (pageCss, tableOldDefaultCss, tableDefaultCss)
+import DemoCss exposing (pageCss, tableDefaultCss, tableOldDefaultCss)
 import Html exposing (Html, a, div, input, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Options exposing (..)
 import Tuple exposing (first, second)
 
 
@@ -104,6 +105,11 @@ data =
     ]
 
 
+options : Options
+options =
+    Options Sorting Filtering Selecting Dragging Editing (Pagination 5)
+
+
 type alias Model =
     { tableState : AT.Model Msg Person }
 
@@ -116,7 +122,7 @@ type Msg
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { tableState = AT.init columns data 5 }, Cmd.none )
+    ( { tableState = AT.init columns data options }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
