@@ -505,7 +505,7 @@ viewBodyRows : Model msg a -> List Int -> (Msg -> msg) -> List (Html msg)
 viewBodyRows model indexes toMsg =
     let
         window =
-            case Options.pagination model.options of
+            case pagination model.options of
                 Pagination pageSize ->
                     List.take pageSize <| List.drop (pageSize * (model.page - 1)) indexes
 
