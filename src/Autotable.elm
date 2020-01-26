@@ -420,6 +420,15 @@ headerCellAttrs model toMsg c =
 
             NoDragging ->
                 []
+        , case ( dragging model.options, sorting model.options ) of
+            ( Dragging, _ ) ->
+                [ style "user-select" "none" ]
+
+            ( _, Sorting ) ->
+                [ style "user-select" "none" ]
+
+            ( _, _ ) ->
+                []
         , [ class <| "autotable__column autotable__column-" ++ c.key ]
         ]
 
