@@ -1,4 +1,4 @@
-module Autotable exposing (..)
+module Table exposing (..)
 
 import Array exposing (Array)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
