@@ -107,7 +107,7 @@ data =
 
 options : Options
 options =
-    Options Sorting Filtering Selecting Dragging Editing (Pagination 5)
+    Options Sorting Filtering Selecting Dragging Editing (Pagination 5) (Fill 5)
 
 
 type alias Model =

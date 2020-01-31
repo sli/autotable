@@ -165,6 +165,7 @@ tableDefaultCss =
                 [ backgroundColor <| hex "63B3ED"
                 , color <| hex "FFFFFF"
                 ]
+            , selector "td.autotable__cell-empty" [ padding (rem 2) ]
             ]
 
 
@@ -242,4 +243,5 @@ tableOldDefaultCss =
                 [ backgroundColor <| hex "63B3ED"
                 , color <| hex "FFFFFF"
                 ]
+            , selector "td.autotable__cell-empty" [ important <| padding (rem 1.89) ]
             ]

@@ -415,7 +415,6 @@ headerCellAttrs model toMsg c =
                 , onDragEnd <| toMsg DragEnd
                 , onDragOver <| toMsg <| DragOver c.key
                 , draggable "true"
-                , style "user-select" "none"
                 ]
 
             NoDragging ->
@@ -569,36 +568,48 @@ viewBodyRows model indexes toMsg =
                         NoEditing ->
                             []
                     ]
+
+        fillRows =
+            case fill model.options of
+                Fill fillAmt ->
+                    if List.length window < fillAmt then
+                        let
+                            count =
+                                fillAmt - List.length window
+
+                            baseColCount =
+                                List.length model.columns
+
+                            colCount =
+                                case ( editing model.options, selecting model.options ) of
+                                    ( Editing, Selecting ) ->
+                                        baseColCount + 2
+
+                                    ( Editing, NoSelecting ) ->
+                                        baseColCount + 1
+
+                                    ( NoEditing, Selecting ) ->
+                                        baseColCount + 1
+
+                                    ( NoEditing, NoSelecting ) ->
+                                        baseColCount
+
+                            emptyRow =
+                                tr [ class "autotable__row-empty" ] <|
+                                    List.repeat colCount <|
+                                        td [ class "autotable__cell-empty" ] []
+                        in
+                        List.repeat count emptyRow
+
+                    else
+                        []
+
+                NoFill ->
+                    []
     in
     List.concat
         [ List.map2 buildRow window rows
-        , case fill model.options of
-            Fill fillAmt ->
-                if List.length window < fillAmt then
-                    let
-                        count =
-                            fillAmt - List.length window
-
-                        colCount =
-                            case editing model.options of
-                                Editing ->
-                                    List.length model.columns + 1
-
-                                NoEditing ->
-                                    List.length model.columns
-
-                        emptyRow =
-                            tr [ class "autotable__row-empty" ] <|
-                                List.repeat colCount <|
-                                    td [ class "autotable__cell-empty" ] []
-                    in
-                    List.repeat count emptyRow
-
-                else
-                    []
-
-            NoFill ->
-                []
+        , fillRows
         ]
 
 
