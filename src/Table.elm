@@ -570,7 +570,36 @@ viewBodyRows model indexes toMsg =
                             []
                     ]
     in
-    List.map2 buildRow window rows
+    List.concat
+        [ List.map2 buildRow window rows
+        , case fill model.options of
+            Fill fillAmt ->
+                if List.length window < fillAmt then
+                    let
+                        count =
+                            fillAmt - List.length window
+
+                        colCount =
+                            case editing model.options of
+                                Editing ->
+                                    List.length model.columns + 1
+
+                                NoEditing ->
+                                    List.length model.columns
+
+                        emptyRow =
+                            tr [ class "autotable__row-empty" ] <|
+                                List.repeat colCount <|
+                                    td [ class "autotable__cell-empty" ] []
+                    in
+                    List.repeat count emptyRow
+
+                else
+                    []
+
+            NoFill ->
+                []
+        ]
 
 
 viewDisplayRow : Column msg a -> a -> Html msg
