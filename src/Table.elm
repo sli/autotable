@@ -1,7 +1,7 @@
-module Elements.Autotable.Table exposing (..)
+module Table exposing (..)
 
 import Array exposing (Array)
-import Elements.Autotable.Options exposing (..)
+import Options exposing (..)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (checked, class, draggable, placeholder, style, type_)
 import Html.Events exposing (on, onCheck, onClick, onInput)
