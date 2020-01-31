@@ -1,11 +1,11 @@
-module Table exposing (..)
+module Elements.Autotable.Table exposing (..)
 
 import Array exposing (Array)
+import Elements.Autotable.Options exposing (..)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (checked, class, draggable, placeholder, style, type_)
 import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
-import Options exposing (..)
 import Tuple exposing (first, second)
 
 
@@ -44,6 +44,7 @@ type alias Model msg a =
     , selections : List Int
     , page : Int
     , options : Options
+    , key : String
     }
 
 
@@ -161,8 +162,8 @@ setOrder direction data =
             data
 
 
-init : List (Column msg a) -> List a -> Options -> Model msg a
-init columns data options =
+init : String -> List (Column msg a) -> List a -> Options -> Model msg a
+init key columns data options =
     { dragging = Nothing
     , columns = columns
     , data = Array.fromList data
@@ -172,6 +173,7 @@ init columns data options =
     , selections = []
     , page = 1
     , options = options
+    , key = key
     }
 
 
@@ -378,7 +380,7 @@ view model toMsg =
     in
     div []
         [ table
-            [ class "autotable" ]
+            [ class <| "autotable autotable-" ++ model.key ]
             [ thead []
                 headerRows
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
