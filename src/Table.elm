@@ -1,11 +1,11 @@
 module Table exposing (..)
 
 import Array exposing (Array)
-import Options exposing (..)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (checked, class, draggable, placeholder, style, type_)
 import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
+import Options exposing (..)
 import Tuple exposing (first, second)
 
 
@@ -667,3 +667,17 @@ viewPagination model filteredIndexes toMsg =
                     viewPaginationButton model.page toMsg
     in
     div [ class "autotable__pagination" ] pageButtons
+
+
+
+-- Column shortcuts
+
+
+noSorting : a -> String
+noSorting _ =
+    ""
+
+
+noFiltering : a -> String -> Bool
+noFiltering _ _ =
+    True

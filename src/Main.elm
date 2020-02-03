@@ -17,30 +17,6 @@ type alias Person =
     }
 
 
-stringSort : (Person -> String) -> Person -> String
-stringSort fn d =
-    fn d
-
-
-numberSort : (Person -> Int) -> Person -> String
-numberSort fn d =
-    String.fromInt <| fn d
-
-
-stringFilter : (Person -> String) -> Person -> String -> Bool
-stringFilter fn d s =
-    let
-        ls =
-            String.toLower s
-    in
-    String.startsWith ls <| String.toLower <| fn d
-
-
-numberFilter : (Person -> Int) -> Person -> String -> Bool
-numberFilter fn d s =
-    String.startsWith s <| String.fromInt <| fn d
-
-
 columns : List (AT.Column Msg Person)
 columns =
     [ AT.Column
@@ -49,15 +25,15 @@ columns =
         .name
         (\p i -> input [ type_ "text", value p.name, onInput <| Edit "name" i ] [])
         .name
-        (stringFilter .name)
+        (String.startsWith << .name)
         (\r v -> { r | name = v })
     , AT.Column
         "Age"
         "age"
-        (\p -> String.fromInt p.age)
+        (String.fromInt << .age)
         (\p i -> input [ type_ "text", value <| String.fromInt p.age, onInput <| Edit "age" i ] [])
-        (numberSort .age)
-        (numberFilter .age)
+        (String.fromInt << .age)
+        (String.startsWith << String.fromInt << .age)
         (\r v ->
             case String.toInt v of
                 Just age ->
@@ -69,10 +45,10 @@ columns =
     , AT.Column
         "Cats"
         "cats"
-        (\p -> String.fromInt p.cats)
+        (String.fromInt << .cats)
         (\p i -> input [ type_ "text", value <| String.fromInt p.cats, onInput <| Edit "cats" i ] [])
-        (numberSort .cats)
-        (numberFilter .cats)
+        (String.fromInt << .cats)
+        (String.startsWith << String.fromInt << .cats)
         (\r v ->
             case String.toInt v of
                 Just cats ->
