@@ -1,7 +1,6 @@
 {
   "name": "autotable",
-  "version": "0.1.0",
-  "main": "index.js",
+  "version": "1.0.0",
   "license": "MIT",
   "devDependencies": {
     "elm": "^0.19.1-3",
