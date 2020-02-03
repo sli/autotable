@@ -14,7 +14,9 @@ are great.
 * Row selection
 * Row editing
 * Drag and drop reorderable columns
-* No CSS, and therefore no opinion on how it looks
+* No CSS, and therefore no opinion on how it looks. Bring your own styles
+* Ability to enable/disable features
+* A just-ok API!
 
 ## Half-Features (or Free Features?)
 

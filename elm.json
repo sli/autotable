@@ -1,7 +1,7 @@
 {
     "type": "package",
     "name": "sli/autotable",
-    "summary": "A simple datatable.",
+    "summary": "A simple but extensible datatable.",
     "license": "MIT",
     "version": "1.0.0",
     "exposed-modules": [
