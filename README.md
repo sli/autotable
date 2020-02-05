@@ -1,5 +1,3 @@
-![](logo.svg)
-
 # Autotable
 
 An in-development datatable for Elm. The code is going to be a bit bad for a
