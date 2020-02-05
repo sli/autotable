@@ -15,17 +15,6 @@ while but the functionality should work as advertised regardless.
 * Ability to enable/disable features
 * A just-ok API!
 
-## Half-Features (or Free Features?)
-
-Some features are supported just due to the design of Elm applications. As the
-signals sent by the table are piped into the table's `update` function by the
-programmer using the table, additional features can be supplied to the table
-without the table itself supporting them. Some examples:
-
-* Updating the table data (it's in the table state as an `Array`)
-* Remote sorting/filtering/pagination/etc., just return a `Cmd Msg` that can
-  then dispatch a signal that will update the table
-
 ## Styling
 
 The table itself does no styling beyond two column widths. To style the demo, I
@@ -54,22 +43,7 @@ There are also a few more class names in use that can (and should) be styled:
   Most likely used to set the column's width.
 * `th.autotable__actions` - Action cells.
 
-## Todo
-
-* Resizable columns
-* Better documentation, even if usage is a bit awkward
-
-## Running the Demo
-
-`$ yarn && yarn start`
-
 ## Usage
-
-Install from the package repository:
-
-```bash
-$ elm install sli/autotable
-```
 
 If you're going to use drag and drop columns, you'll need this Javascript:
 
@@ -94,7 +68,8 @@ options : Options
 options =
     Options Sorting Filtering Selecting Dragging Editing (Pagination 10) (Fill 10)
 
-{-| Ideally `data` and `columns` are defined somewhere. -}
+{-| Ideally `data` and `columns` are defined somewhere.
+-}
 init : () -> ( Model, Cmd Msg )
 init _ =
   { tableState = AT.init "my-table" columns data options }
