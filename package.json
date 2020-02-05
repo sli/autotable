@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "cd examples/basic && elm-live src/Main.elm --hot --port=4000 --open --start-page=index.html --dir=static/ -- --debug --output=static/demo.min.js && cd ..",
-    "build:demo": "cd examples/basic && elm make src/Main.elm --optimize --output=dist/demo.js && cp static/index.html dist/",
+    "build:demo": "cd examples/basic && elm make src/Main.elm --optimize --output=../../dist/demo.js && cp static/index.html ../../dist/",
     "build:docs": "elm make src/Table.elm --docs=docs.json",
     "clean": "rm -rf dist/ examples/basic/static/demo.min.js"
   }
