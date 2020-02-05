@@ -1,4 +1,4 @@
 node_modules/
 elm-stuff/
 dist/
-static/demo.min.js
+examples/basic/static/demo.min.js

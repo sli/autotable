@@ -8,11 +8,9 @@
     "uglify-js": "^3.7.2"
   },
   "scripts": {
-    "start": "elm-live src/Main.elm --hot --port=4000 --open --start-page=index.html --dir=static/ -- --debug --output=static/demo.min.js",
-    "build:demo": "elm make src/Main.elm --optimize --output=dist/demo.js && cp static/index.html dist/",
-    "build:optimize": "uglifyjs dist/demo.js --compress \"pure_funcs='F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9',pure_getters,keep_fargs=false,unsafe_comps,unsafe\" | uglifyjs --mangle --output=dist/demo.min.js",
-    "build:dist": "yarn clean && yarn build:demo && yarn build:optimize && rm dist/demo.js",
-    "build:docs": "elm make src/Autotable.elm --docs=docs.json",
-    "clean": "rm -rf dist/ static/demo.min.js"
+    "start": "cd examples/basic && elm-live src/Main.elm --hot --port=4000 --open --start-page=index.html --dir=static/ -- --debug --output=static/demo.min.js && cd ..",
+    "build:demo": "cd examples/basic && elm make src/Main.elm --optimize --output=dist/demo.js && cp static/index.html dist/",
+    "build:docs": "elm make src/Table.elm --docs=docs.json",
+    "clean": "rm -rf dist/ examples/basic/static/demo.min.js"
   }
 }

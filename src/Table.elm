@@ -1,4 +1,4 @@
-module Table exposing (..)
+module Table exposing (Column, Direction, Filter, Model, Msg(..), Sorting, init, noFiltering, noSorting, update, view)
 
 import Array exposing (Array)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
@@ -63,20 +63,6 @@ type Msg
     | SetPage Int
     | ToggleSelection Int
     | ToggleSelectAll
-
-
-zip : List a -> List b -> List ( a, b )
-zip xs ys =
-    List.map2 Tuple.pair xs ys
-
-
-listInsert : List a -> Int -> a -> List a
-listInsert data index item =
-    List.concat
-        [ List.take index data
-        , [ item ]
-        , List.drop index data
-        ]
 
 
 listContains : a -> List a -> Bool
@@ -234,7 +220,11 @@ update msg model =
                                         List.filter (\c -> c.key /= key) model.columns
 
                                     columns =
-                                        listInsert cleaned targetPosition column
+                                        List.concat
+                                            [ List.take targetPosition cleaned
+                                            , [ column ]
+                                            , List.drop targetPosition cleaned
+                                            ]
                                 in
                                 { model | columns = columns }
 
