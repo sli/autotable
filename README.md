@@ -3,8 +3,7 @@
 # Autotable
 
 An in-development datatable for Elm. The code is going to be a bit bad for a
-while but the functionality should work as advertised regardless. Strong types
-are great.
+while but the functionality should work as advertised regardless.
 
 ## Features
 
@@ -60,18 +59,21 @@ There are also a few more class names in use that can (and should) be styled:
 ## Todo
 
 * Resizable columns
-* Documentation, even if usage is a bit awkward
+* Better documentation, even if usage is a bit awkward
 
 ## Running the Demo
 
-`$ yarn install && yarn start`
+`$ yarn && yarn start`
 
 ## Usage
 
-You mostly can't, for the time being, since it's not published. But if you
-really want to, you can pull this code to use it. Just don't forget you'll need
-a little Javascript. It can be found in `static/index.html`, but I'll put it
-here, too.
+Install from the package repository:
+
+```bash
+$ elm install sli/autotable
+```
+
+If you're going to use drag and drop columns, you'll need this Javascript:
 
 ```js
 document.body.addEventListener('dragstart', e =>
@@ -82,6 +84,7 @@ Here's a minimal example:
 
 ```elm
 import Autotable as AT
+import Autotable.Options exposing (..)
 
 type Model =
   { tableState : AT.Model }
@@ -89,19 +92,24 @@ type Model =
 type Msg
   = TableMsg AT.Msg
 
-{-| Ideally `data` and `columns` are defined somewhere.
--}
+options : Options
+options =
+    Options Sorting Filtering Selecting Dragging Editing (Pagination 10) (Fill 10)
+
+{-| Ideally `data` and `columns` are defined somewhere. -}
 init : () -> ( Model, Cmd Msg )
 init _ =
-  { tableState = AT.init columns data 5 }
+  { tableState = AT.init "my-table" columns data options }
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     TableMsg tableMsg ->
-      ( { model | tableState = AT.update tableMsg})
+      ( { model | tableState = AT.update tableMsg model.tableState }, Cmd.none )
 
 view : Model -> Html Msg
 view model =
   div [] [ AT.view model.tableState TableMsg ]
 ```
+
+For a more complete example, see the [basic one](examples/basic/src/Main.elm).

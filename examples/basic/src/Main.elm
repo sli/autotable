@@ -5,8 +5,8 @@ import DemoCss exposing (pageCss, tableDefaultCss, tableOldDefaultCss)
 import Html exposing (Html, a, div, input, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, type_, value)
 import Html.Events exposing (onClick, onInput)
-import Options exposing (..)
-import Table as AT
+import Autotable.Options exposing (..)
+import Autotable as AT
 import Tuple exposing (first, second)
 
 
