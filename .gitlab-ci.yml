@@ -4,6 +4,7 @@ test_build:
   only:
     changes:
       - src/**/*
+      - examples/**/*
       - .gitlab-ci.yml
       - elm.json
       - package.json
@@ -13,4 +14,4 @@ test_build:
     expire_in: 1 week
   script:
     - yarn
-    - yarn build:dist
+    - yarn build:demo
