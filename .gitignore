@@ -2,3 +2,5 @@ node_modules/
 elm-stuff/
 dist/
 examples/basic/static/demo.min.js
+examples/basic/elm-stuff/
+examples/basic/node_modules/
