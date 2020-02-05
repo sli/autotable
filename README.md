@@ -110,4 +110,4 @@ view model =
   div [] [ AT.view model.tableState TableMsg ]
 ```
 
-For a more complete example, see the [basic one](examples/basic/src/Main.elm).
+For a more complete example, see the [basic one](https://gitlab.com/docmenthol/autotable/-/blob/master/examples/basic/src/Main.elm).
