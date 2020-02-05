@@ -1,11 +1,48 @@
-module Autotable exposing (Column, Direction, Filter, Model, Msg(..), Sorting, init, noFiltering, noSorting, update, view)
+module Autotable exposing
+    ( Column, Filter, Model, Msg(..), Sorting
+    , noFiltering, noSorting
+    , init
+    , update
+    , view
+    )
+
+{-| A datatable.
+
+See an example of this library in action [here](https://gitlab.com/docmenthol/autotable/-/blob/master/examples/basic/src/Main.elm).
+
+
+# Types
+
+@docs Column, Filter, Model, Msg, Sorting
+
+
+# Defaults
+
+@docs noFiltering, noSorting
+
+
+# Init
+
+@docs init
+
+
+# Update
+
+@docs update
+
+
+# View
+
+@docs view
+
+-}
 
 import Array exposing (Array)
+import Autotable.Options exposing (..)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (checked, class, draggable, placeholder, style, type_)
 import Html.Events exposing (on, onCheck, onClick, onInput)
 import Json.Decode as D
-import Autotable.Options exposing (..)
 import Tuple exposing (first, second)
 
 
@@ -15,14 +52,20 @@ type Direction
     | None
 
 
+{-| Represents a sorting direction.
+-}
 type alias Sorting =
     ( String, Direction )
 
 
+{-| Represents a filter.
+-}
 type alias Filter =
     ( String, String )
 
 
+{-| Define a table column.
+-}
 type alias Column msg a =
     { label : String
     , key : String
@@ -34,6 +77,8 @@ type alias Column msg a =
     }
 
 
+{-| Table state.
+-}
 type alias Model msg a =
     { columns : List (Column msg a)
     , data : Array a
@@ -48,6 +93,8 @@ type alias Model msg a =
     }
 
 
+{-| Table signals.
+-}
 type Msg
     = Sort String
     | Filter String String
@@ -148,6 +195,8 @@ setOrder direction data =
             data
 
 
+{-| Create table state.
+-}
 init : String -> List (Column msg a) -> List a -> Options -> Model msg a
 init key columns data options =
     { dragging = Nothing
@@ -163,6 +212,8 @@ init key columns data options =
     }
 
 
+{-| Update table state.
+-}
 update : Msg -> Model msg a -> Model msg a
 update msg model =
     case msg of
@@ -313,6 +364,8 @@ sorter sortFn data a b =
     compare ca cb
 
 
+{-| Render table.
+-}
 view : Model msg a -> (Msg -> msg) -> Html msg
 view model toMsg =
     let
@@ -659,15 +712,15 @@ viewPagination model filteredIndexes toMsg =
     div [ class "autotable__pagination" ] pageButtons
 
 
-
--- Column shortcuts
-
-
+{-| No-op function for disabled sorting. This will go away one day.
+-}
 noSorting : a -> String
 noSorting _ =
     ""
 
 
+{-| No-op function for diabled filtering. This will also go away one day.
+-}
 noFiltering : a -> String -> Bool
 noFiltering _ _ =
     True
