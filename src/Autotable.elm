@@ -41,7 +41,7 @@ import Array exposing (Array)
 import Autotable.Options exposing (..)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (checked, class, draggable, placeholder, style, type_)
-import Html.Events exposing (on, onCheck, onClick, onInput)
+import Html.Events exposing (on, onCheck, onClick, onDoubleClick, onInput)
 import Json.Decode as D
 import Tuple exposing (first, second)
 
@@ -110,6 +110,9 @@ type Msg
     | SetPage Int
     | ToggleSelection Int
     | ToggleSelectAll
+    | RowClick Int
+    | RowDoubleClick Int
+    | RowRightClick Int
 
 
 listContains : a -> List a -> Bool
@@ -145,6 +148,11 @@ onDrop msg =
 onToggleCheck : msg -> Attribute msg
 onToggleCheck msg =
     on "input" <| D.succeed msg
+
+
+onRightClick : msg -> Attribute msg
+onRightClick msg =
+    on "contextmenu" <| D.succeed msg
 
 
 stepDirection : Direction -> Direction
@@ -341,6 +349,15 @@ update msg model =
             else
                 { model | selections = List.range 0 <| Array.length model.data - 1 }
 
+        RowClick index ->
+            model
+
+        RowDoubleClick index ->
+            model
+
+        RowRightClick index ->
+            model
+
 
 sorter : (a -> String) -> Array a -> Int -> Int -> Order
 sorter sortFn data a b =
@@ -424,8 +441,7 @@ view model toMsg =
     div []
         [ table
             [ class <| "autotable autotable-" ++ model.key ]
-            [ thead []
-                headerRows
+            [ thead [] headerRows
             , tbody [] <| viewBodyRows model sortedIndexes toMsg
             ]
         , viewPagination model filteredIndexes toMsg
@@ -577,7 +593,12 @@ viewBodyRows model indexes toMsg =
                     else
                         StartEdit
             in
-            tr [] <|
+            tr
+                [ onClick <| toMsg <| RowClick index
+                , onDoubleClick <| toMsg <| RowDoubleClick index
+                , onRightClick <| toMsg <| RowRightClick index
+                ]
+            <|
                 List.concat
                     [ case selecting model.options of
                         Selecting ->
