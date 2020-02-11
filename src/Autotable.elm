@@ -41,7 +41,7 @@ import Array exposing (Array)
 import Autotable.Options exposing (..)
 import Html exposing (Attribute, Html, a, button, div, input, span, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (checked, class, draggable, placeholder, style, type_)
-import Html.Events exposing (on, onCheck, onClick, onDoubleClick, onInput)
+import Html.Events exposing (on, onCheck, onClick, onDoubleClick, onInput, preventDefaultOn)
 import Json.Decode as D
 import Tuple exposing (first, second)
 
@@ -152,7 +152,12 @@ onToggleCheck msg =
 
 onRightClick : msg -> Attribute msg
 onRightClick msg =
-    on "contextmenu" <| D.succeed msg
+    preventDefaultOn
+        "contextmenu"
+    <|
+        D.map
+            (\m -> ( m, True ))
+            (D.succeed msg)
 
 
 stepDirection : Direction -> Direction
@@ -349,13 +354,13 @@ update msg model =
             else
                 { model | selections = List.range 0 <| Array.length model.data - 1 }
 
-        RowClick index ->
+        RowClick _ ->
             model
 
-        RowDoubleClick index ->
+        RowDoubleClick _ ->
             model
 
-        RowRightClick index ->
+        RowRightClick _ ->
             model
 
 
